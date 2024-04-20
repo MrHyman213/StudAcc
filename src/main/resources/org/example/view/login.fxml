@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane prefHeight="250.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controller.LoginController">
+   <children>
+      <Label layoutX="15.0" layoutY="15.0" text="Учет студентов">
+         <font>
+            <Font name="Arial" size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="tfLogin" layoutX="15.0" layoutY="70.0" prefHeight="30.0" prefWidth="250.0" promptText="Логин" />
+      <Button fx:id="btOk" layoutX="15.0" layoutY="175.0" mnemonicParsing="false" onAction="#loginAct" text="Войти" />
+      <PasswordField fx:id="tfPassword" layoutX="15.0" layoutY="125.0" prefHeight="30.0" prefWidth="250.0" promptText="Пароль" />
+      <Label fx:id="lbError" layoutX="80.0" layoutY="180.0" text="Label" textFill="RED" visible="false" />
+   </children>
+</AnchorPane>

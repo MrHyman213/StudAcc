@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="root" prefHeight="550.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controller.StudentController">
+   <children>
+      <Label fx:id="lbInitials" layoutX="155.0" layoutY="15.0" text="Студент: ">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lbGroup" layoutX="15.0" layoutY="15.0" text="Группа: ">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Line endX="670.0" layoutX="114.0" layoutY="60.0" startX="-100.0" strokeWidth="2.0">
+         <rotationAxis>
+            <Point3D />
+         </rotationAxis>
+      </Line>
+      <TextField fx:id="tfCaseNumber" layoutX="170.0" layoutY="75.0" prefHeight="31.0" prefWidth="138.0" />
+      <Label layoutX="15.0" layoutY="80.0" text="Номер личного дела:" />
+      <Label layoutX="320.0" layoutY="80.0" text="Номер приказа:" />
+      <ComboBox fx:id="cbOrderNumber" layoutX="440.0" layoutY="75.0" prefWidth="150.0" />
+      <CheckBox fx:id="cbFree" layoutX="598.0" layoutY="95.0" mnemonicParsing="false" text="Свободное посещение" />
+      <CheckBox fx:id="cbAcadem" layoutX="598.0" layoutY="70.0" mnemonicParsing="false" text="Академический" />
+      <Line endX="670.0" layoutX="115.0" layoutY="125.0" startX="-100.0" strokeWidth="2.0" />
+      <Label layoutX="23.0" layoutY="149.0" prefHeight="20.0" prefWidth="70.0" text="Фамилия:" />
+      <TextField fx:id="tfSurname" layoutX="108.0" layoutY="143.0" prefHeight="31.0" prefWidth="180.0" />
+      <Label layoutX="54.0" layoutY="191.0" prefHeight="21.0" prefWidth="35.0" text="Имя:" textAlignment="RIGHT" />
+      <Label layoutX="22.0" layoutY="234.0" prefHeight="21.0" prefWidth="70.0" text="Отчество:" />
+      <TextField fx:id="tfName" layoutX="107.0" layoutY="186.0" prefHeight="31.0" prefWidth="180.0" />
+      <TextField fx:id="tfPatronymic" layoutX="108.0" layoutY="229.0" prefHeight="31.0" prefWidth="180.0" />
+      <Line endX="100.0" layoutX="385.0" layoutY="263.0" rotate="90.0" startX="-150.0" strokeWidth="2.0" />
+      <Label layoutX="385.0" layoutY="146.0" text="Индекс:" />
+      <Label layoutX="382.0" layoutY="191.0" text="Область:" />
+      <TextField fx:id="tfStreet" layoutX="451.0" layoutY="315.0" prefHeight="31.0" prefWidth="180.0" />
+      <TextField fx:id="tfCity" layoutX="451.0" layoutY="270.0" prefHeight="31.0" prefWidth="180.0" />
+      <TextField fx:id="tfIndex" layoutX="451.0" layoutY="143.0" prefHeight="31.0" prefWidth="90.0" />
+      <Label layoutX="393.0" layoutY="234.0" text="Район:" />
+      <ComboBox fx:id="cbRegion" layoutX="451.0" layoutY="186.0" onAction="#regionSelect" prefHeight="31.0" prefWidth="180.0" />
+      <ComboBox fx:id="cbDistrict" layoutX="451.0" layoutY="227.0" prefHeight="31.0" prefWidth="180.0" />
+      <Label layoutX="393.0" layoutY="275.0" text="Город:" />
+      <Label layoutX="394.0" layoutY="320.0" text="Улица:" />
+      <Label layoutX="640.0" layoutY="320.0" text="Дом:" />
+      <TextField fx:id="tfHome" layoutX="676.0" layoutY="315.0" prefHeight="31.0" prefWidth="40.0" />
+      <TextField fx:id="tfFlat" layoutX="746.0" layoutY="315.0" prefHeight="31.0" prefWidth="40.0" />
+      <Label layoutX="722.0" layoutY="320.0" text="Кв:" />
+      <Line endX="670.0" layoutX="115.0" layoutY="410.0" startX="-100.0" strokeWidth="2.0" />
+      <Label layoutX="15.0" layoutY="435.0" text="Образование:" />
+      <ComboBox fx:id="cbEducation" layoutX="120.0" layoutY="430.0" prefHeight="31.0" prefWidth="180.0" />
+      <Label layoutX="512.0" layoutY="435.0" text="Год получения аттестата:" />
+      <Line endX="670.0" layoutX="115.0" layoutY="479.0" startX="-100.0" strokeWidth="2.0" />
+      <Button fx:id="btPrev" layoutX="15.0" layoutY="505.0" mnemonicParsing="false" onAction="#prevAct" text="&lt;&lt;" />
+      <Button fx:id="btNext" layoutX="65.0" layoutY="505.0" mnemonicParsing="false" onAction="#nextAct" text="&gt;&gt;" />
+      <Button layoutX="722.0" layoutY="505.0" mnemonicParsing="false" onAction="#exitAct" text="Выход" />
+      <Button layoutX="620.0" layoutY="505.0" mnemonicParsing="false" onAction="#saveAct" text="Сохранить" />
+      <Label layoutX="8.0" layoutY="275.0" prefHeight="21.0" prefWidth="110.0" text="Дата рождения:" />
+      <Label layoutX="87.0" layoutY="320.0" text="Пол:" />
+      <Label layoutX="5.0" layoutY="365.0" text="Личный телефон:" />
+      <TextField fx:id="tfPhone" layoutX="128.0" layoutY="360.0" prefHeight="31.0" prefWidth="180.0" />
+      <ComboBox fx:id="cbSex" layoutX="128.0" layoutY="315.0" prefHeight="31.0" prefWidth="180.0" />
+      <DatePicker fx:id="dpBirthDate" layoutX="126.0" layoutY="270.0" prefHeight="31.0" prefWidth="180.0" />
+      <TextField fx:id="tfGraduationYear" layoutX="697.0" layoutY="430.0" prefHeight="31.0" prefWidth="90.0" />
+      <TextField fx:id="tfSnils" layoutX="451.0" layoutY="362.0" prefHeight="26.0" prefWidth="180.0" />
+      <Label layoutX="386.0" layoutY="366.0" text="СНИЛС:" />
+   </children>
+</AnchorPane>

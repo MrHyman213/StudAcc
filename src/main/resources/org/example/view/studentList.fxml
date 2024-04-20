@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="root" prefHeight="600.0" prefWidth="560.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controller.GroupController">
+   <children>
+      <ComboBox fx:id="cbGroup" layoutX="14.0" layoutY="75.0" onAction="#isSelected" prefWidth="150.0" promptText="Группа" />
+      <TableView fx:id="tvStudents" layoutX="17.0" layoutY="131.0" prefHeight="422.0" prefWidth="527.0">
+        <columns>
+          <TableColumn fx:id="clSurname" prefWidth="157.0" text="Фамилия" />
+          <TableColumn fx:id="clName" prefWidth="171.0" text="Имя" />
+            <TableColumn fx:id="clPatronymic" prefWidth="198.0" text="Отчество" />
+        </columns>
+      </TableView>
+      <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#addAct" text="Добавить" />
+      <Button layoutX="122.0" layoutY="14.0" mnemonicParsing="false" onAction="#cartAct" text="Карточка" />
+      <Button layoutX="232.0" layoutY="14.0" mnemonicParsing="false" onAction="#delAct" text="Исключить" />
+      <Button layoutX="357.0" layoutY="14.0" mnemonicParsing="false" onAction="#moveAct" text="Перевести" />
+      <Button layoutX="475.0" layoutY="14.0" mnemonicParsing="false" onAction="#generateAct" text="Печать" />
+      <Line endX="430.0" layoutX="115.0" layoutY="61.0" startX="-100.0" />
+      <Label fx:id="lbCount" layoutX="524.0" layoutY="80.0" prefHeight="21.0" prefWidth="20.0" text="counter" />
+      <Line endX="430.0" layoutX="115.0" layoutY="117.0" startX="-100.0" />
+      <Button layoutX="478.0" layoutY="563.0" mnemonicParsing="false" onAction="#exitAct" text="Выход" />
+   </children>
+</AnchorPane>
