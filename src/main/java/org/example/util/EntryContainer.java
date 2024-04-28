@@ -60,18 +60,4 @@ public class EntryContainer {
         return container.get(cell).get(name);
     }
 
-    public static Map<String, Integer> convertToMap(List<? extends Entry> list){
-        Map<String, Integer> map = new HashMap<>();
-        for (Entry entry: list)
-            map.put(entry.getName(), entry.getId());
-        return map;
-    }
-
-    public static Map<String, Integer> convertStudentToMap(List<ShortStudent> list){
-        Map<String, Integer> map = new HashMap<>();
-        for (ShortStudent student: list)
-            map.put(student.getInitials(), student.getId());
-        return map;
-    }
-
 }

@@ -47,8 +47,10 @@ public class SpecializationController {
             WindowManager.open("login", "Вход", false, false);
         }
         specList.setOnMouseClicked(mouseEvent -> {
-            GroupController.title = specList.getSelectionModel().getSelectedItem();
-            WindowManager.open("studentList", specList.getSelectionModel().getSelectedItem(), false, true);
+            if(specList.getSelectionModel().getSelectedItem() != null && mouseEvent.getClickCount() == 2) {
+                GroupController.title = specList.getSelectionModel().getSelectedItem();
+                WindowManager.open("studentList", specList.getSelectionModel().getSelectedItem(), false, true);
+            }
         });
     }
 }

@@ -45,15 +45,17 @@ public class GroupController {
     }
 
     private void initGroups(){
-        cbGroup.setItems(FXCollections.observableArrayList(RequestService.getGroupList(title)));
-        cbGroup.getSelectionModel().selectFirst();
+        try {
+            cbGroup.setItems(FXCollections.observableArrayList(RequestService.getGroupList(title)));
+            cbGroup.getSelectionModel().selectFirst();
+        } catch (NullPointerException ignored){}
     }
 
     private void initTable(){
         tvStudents.setRowFactory(tv -> {
             TableRow<ShortStudent> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
                     ShortStudent rowData = row.getItem();
                     StudentController.INITIALS = rowData.getInitials();
                     WindowManager.open("studentDetails", rowData.getInitials(), false, true);

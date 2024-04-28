@@ -2,6 +2,7 @@ package org.example.service;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -70,7 +72,7 @@ public class RequestService {
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        EntryContainer.put("specList", EntryContainer.convertToMap(specList));
+        EntryContainer.put("specList", MappingService.convertToMap(specList));
         return specList;
     }
 
@@ -86,7 +88,7 @@ public class RequestService {
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        EntryContainer.put("groupList", EntryContainer.convertToMap(groupList));
+        EntryContainer.put("groupList", MappingService.convertToMap(groupList));
         return groupList.stream().map(Group::getName).collect(Collectors.toList());
     }
 
@@ -103,7 +105,7 @@ public class RequestService {
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        EntryContainer.put("studentList", EntryContainer.convertStudentToMap(students));
+        EntryContainer.put("studentList", MappingService.convertStudentToMap(students));
         return students;
     }
 
@@ -136,7 +138,7 @@ public class RequestService {
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        EntryContainer.put("educationList", EntryContainer.convertToMap(educations));
+        EntryContainer.put("educationList", MappingService.convertToMap(educations));
         return educations.stream().map(Education::getName).collect(Collectors.toList());
     }
 
@@ -154,7 +156,7 @@ public class RequestService {
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        EntryContainer.put("regionList", EntryContainer.convertToMap(regionList));
+        EntryContainer.put("regionList", MappingService.convertToMap(regionList));
         return regionList.stream().map(Region::getName).collect(Collectors.toList());
     }
 
@@ -172,7 +174,7 @@ public class RequestService {
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        EntryContainer.put("districtList", EntryContainer.convertToMap(districtList));
+        EntryContainer.put("districtList", MappingService.convertToMap(districtList));
         return districtList.stream().map(District::getName).collect(Collectors.toList());
 
     }
@@ -191,17 +193,20 @@ public class RequestService {
         } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        EntryContainer.put("orderList", EntryContainer.convertToMap(orderList));
+        EntryContainer.put("orderList", MappingService.convertToMap(orderList));
         return orderList.stream().map(OrderNumber::getName).collect(Collectors.toList());
     }
 
-    public static boolean updateStudent(StudentDTO student, int studentId) {
+    public static boolean createStudent(StudentDTO student) {
         try {
-            request = RequestManager.put(url + "student/update?id=" + studentId, student,
+            student.setBirthDate(student.getBirthDate());
+            request = RequestManager.post(url + "student/new", student,
                     Map.of("Authorization", "Bearer " + user.getToken(), "Content-Type", "application/json"));
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200)
                 return true;
+            else if (response.statusCode() == 500)
+                return false;
             else if (response.statusCode() == 401)
                 throw new UnauthorizedException();
         } catch (IOException | InterruptedException ex) {
@@ -210,18 +215,61 @@ public class RequestService {
         return false;
     }
 
+    public static void updateStudent(StudentDTO student, int studentId) {
+        student.setBirthDate(student.getBirthDate());
+        request = RequestManager.put(url + "student/update?id=" + studentId, student,
+                Map.of("Authorization", "Bearer " + user.getToken(), "Content-Type", "application/json"));
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+    }
+
     public static void updateAddress(AddressDTO address, int addressId){
+        request = RequestManager.put(url + "address/update?id=" + addressId, address,
+                Map.of("Authorization", "Bearer " + user.getToken(), "Content-Type", "application/json"));
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public static int createAddress(AddressDTO address){
         try {
-            request = RequestManager.put(url + "address/update?id=" + addressId, address,
+            request = RequestManager.post(url + "address/new", address,
                     Map.of("Authorization", "Bearer " + user.getToken(), "Content-Type", "application/json"));
-            client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if(response.statusCode() == 200)
+                return Integer.parseInt(response.body());
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+        return 0;
     }
 
-    public static void createAddress(Address address){
+    public static List<String> getGroupList() {
+        List<Group> groupList;
+        request = RequestManager.get(url + "student/group/all",
+                Map.of("Authorization", "Bearer " + user.getToken()));
+        CompletableFuture<HttpResponse<String>> futureResponse = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+        try {
+            HttpResponse<String> response = futureResponse.get();
+            if (response.statusCode() == 401)
+                throw new UnauthorizedException();
+            groupList = objectMapper.readValue(response.body(),
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, Group.class));
+        } catch (InterruptedException | ExecutionException | JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        EntryContainer.put("allGroupList", MappingService.convertToMap(groupList));
+        return groupList.stream().map(Group::getName).collect(Collectors.toList());
+    }
 
+    public static void moveGroup(String out, String in) {
+        request = RequestManager.get(url + "student/group/move?out=" + out + "&in=" + in,
+                Map.of("Authorization", "Bearer " + user.getToken()));
+        CompletableFuture<HttpResponse<String>> futureResponse = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+        try {
+            HttpResponse<String> response = futureResponse.get();
+            if (response.statusCode() == 401)
+                throw new UnauthorizedException();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

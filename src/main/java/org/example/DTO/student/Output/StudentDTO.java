@@ -25,7 +25,7 @@ public class StudentDTO {
     private boolean akadem;
     private boolean sex;
     private boolean freeVisit;
-    private Date birthDate;
+    private String birthDate;
 
 
 }

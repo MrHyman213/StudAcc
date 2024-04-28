@@ -11,6 +11,7 @@ import org.example.DTO.entries.Education;
 import org.example.DTO.entries.Group;
 import org.example.DTO.entries.OrderNumber;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Data
@@ -23,7 +24,7 @@ public class Student {
     private String patronymic;
     private String caseNumber;
     private boolean akadem;
-    private boolean free;
+    private boolean freeVisit;
 
     private Boolean sex;
     private String snils;

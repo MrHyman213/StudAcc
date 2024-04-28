@@ -7,13 +7,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import org.example.DTO.entries.*;
-import org.example.DTO.student.Output.StudentDTO;
 import org.example.DTO.student.Address;
 import org.example.DTO.student.Student;
 import org.example.service.RequestService;
+import org.example.service.MappingService;
 import org.example.util.EntryContainer;
 import org.example.util.WindowManager;
-import org.modelmapper.ModelMapper;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -111,8 +110,7 @@ public class StudentController implements Initializable {
 
     private static List<String> initList;
     private int index;
-    private int idAddress;
-    private ModelMapper modelMapper = EntryContainer.getModelMapper();
+    private int idAddress = 0;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -123,7 +121,10 @@ public class StudentController implements Initializable {
             setValues(RequestService.getStudentByInitials(INITIALS));
         } else {
             isNew = false;
-            lbGroup.setText(groupName);
+            idAddress = 0;
+            lbGroup.setText("Группа: " + groupName);
+            lbInitials.setText("Добавление студента");
+            initLists();
         }
     }
 
@@ -151,13 +152,18 @@ public class StudentController implements Initializable {
     @FXML
     void saveAct(ActionEvent event) {
         Student student = readComponents();
-        if(RequestService.updateStudent(modelToMap(student), student.getId())){
-            WindowManager.close(lbGroup);
-        } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Ошибка");
-            alert.setContentText("Ошибка сохранения элемента");
+        Address address = student.getAddress();
+        if(address != null)
+            if (address.getId() != 0)
+                RequestService.updateAddress(MappingService.addressToDTO(address), address.getId());
+            else
+                student.setAddress(new Address(RequestService.createAddress(MappingService.addressToDTO(address))));
+        if(!Objects.equals(lbInitials.getText(), "Добавление студента")) {
+            RequestService.updateStudent(MappingService.studentToDTO(student), student.getId());
         }
+        else
+            RequestService.createStudent(MappingService.studentToDTO(student));
+        WindowManager.close(lbGroup);
     }
 
     @FXML
@@ -184,18 +190,11 @@ public class StudentController implements Initializable {
         ));
     }
 
-    private StudentDTO modelToMap(Student student){
-        StudentDTO dto = modelMapper.map(student, StudentDTO.class);
-        dto.setGroupId(student.getGroup().getId());
-        dto.setAddressId(student.getAddress().getId());
-        dto.setOrderNumberId(student.getOrderNumber().getId());
-        dto.setEducationId(student.getOrderNumber().getId());
-        return dto;
-    }
-
     private Student readComponents(){
         Student student = new Student();
-        student.setId(EntryContainer.getIdByName("studentList", lbInitials.getText().replace("Студент: ", "")));
+        try {
+            student.setId(EntryContainer.getIdByName("studentList", lbInitials.getText().replace("Студент: ", "")));
+        } catch (NullPointerException ignored){}
         student.setGroup(new Group(EntryContainer.getIdByName("groupList", lbGroup.getText().replace("Группа: ", "")), lbGroup.getText().replace("Группа: ", "")));
         student.setSurname(tfSurname.getText());
         student.setName(tfName.getText());
@@ -203,20 +202,25 @@ public class StudentController implements Initializable {
         student.setCaseNumber(tfCaseNumber.getText());
         student.setSex(getSex(cbSex.getSelectionModel().getSelectedItem()));
         student.setGraduationYear(Integer.parseInt(tfGraduationYear.getText().replaceAll("[^\\d,]", "")));
+        student.setFreeVisit(cbFree.isSelected());
         student.setAkadem(cbAcadem.isSelected());
+
         student.setSnils(tfSnils.getText());
         student.setBirthDate(dpBirthDate.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         String orderNumber = cbOrderNumber.getSelectionModel().getSelectedItem();
         String education = cbEducation.getSelectionModel().getSelectedItem();
-        String district = cbDistrict.getSelectionModel().getSelectedItem();
-        String region = cbRegion.getSelectionModel().getSelectedItem();
-        student.setAddress(new Address(idAddress,
-                new District(EntryContainer.getIdByName("districtList", district),
-                        district, new Region(EntryContainer.getIdByName("regionList", region), region)),
-                tfCity.getText(), tfStreet.getText(), tfHome.getText(), tfFlat.getText(), tfIndex.getText()));
+        try {
+            String district = cbDistrict.getSelectionModel().getSelectedItem();
+            String region = cbRegion.getSelectionModel().getSelectedItem();
+            student.setAddress(new Address(idAddress,
+                    new District(EntryContainer.getIdByName("districtList", district),
+                            district, new Region(EntryContainer.getIdByName("regionList", region), region)),
+                    tfCity.getText(), tfStreet.getText(), tfHome.getText(), tfFlat.getText(), tfIndex.getText()));
+        } catch (NullPointerException e){
+            student.setAddress(null);
+        }
         student.setOrderNumber(new OrderNumber(EntryContainer.getIdByName("orderList", orderNumber), orderNumber));
         student.setEducation(new Education(EntryContainer.getIdByName("educationList", education), education));
-        student.setFree(cbFree.isSelected());
         student.setPhone(tfPhone.getText());
         return student;
     }
@@ -231,14 +235,14 @@ public class StudentController implements Initializable {
         tfName.setText(student.getName());
         tfPatronymic.setText(student.getPatronymic());
         cbAcadem.setSelected(student.isAkadem());
-        cbFree.setSelected(student.isFree());
+        cbFree.setSelected(student.isFreeVisit());
         cbOrderNumber.setValue(student.getOrderNumber().getName());
         try {
             cbSex.setValue(getSex(student.getSex()));
             cbEducation.setValue(student.getEducation().getName());
-            dpBirthDate.setValue(LocalDate.parse(student.getBirthDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-
+            dpBirthDate.setValue(LocalDate.parse(student.getBirthDate()));
             tfGraduationYear.setText(String.valueOf(student.getGraduationYear()));
+            tfSnils.setText(student.getSnils());
             tfPhone.setText(student.getPhone());
             tfCaseNumber.setText(student.getCaseNumber());
         } catch (NullPointerException ignored){}

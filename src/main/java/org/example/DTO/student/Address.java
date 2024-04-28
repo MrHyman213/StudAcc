@@ -18,4 +18,8 @@ public class Address {
     private String houseNumber;
     private String flatNumber;
     private String index;
+
+    public Address(int id){
+        this.id = id;
+    }
 }
