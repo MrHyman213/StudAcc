@@ -39,4 +39,11 @@ public class RequestManager {
             request.setHeader(entry.getKey(), entry.getValue());
         return request.build();
     }
+
+    public static HttpRequest delete(String url, Map<String, String> headers) {
+        HttpRequest.Builder request = HttpRequest.newBuilder().uri(URI.create(url)).DELETE();
+        for (Map.Entry<String, String> entry: headers.entrySet())
+            request.setHeader(entry.getKey(), entry.getValue());
+        return request.build();
+    }
 }

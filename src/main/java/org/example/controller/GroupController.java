@@ -9,9 +9,12 @@ import javafx.scene.layout.AnchorPane;
 import org.example.DTO.student.ShortStudent;
 import org.example.service.RequestService;
 import org.example.util.EntryContainer;
+import org.example.util.RequestManager;
 import org.example.util.WindowManager;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GroupController {
@@ -98,7 +101,14 @@ public class GroupController {
 
     @FXML
     void delAct(ActionEvent event) {
-
+        ShortStudent student = tvStudents.getSelectionModel().getSelectedItem();
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Удаление студента");
+        alert.setContentText("Вы уверены что хотите удалить студента?");
+        alert.setContentText("Вы уверены что хотите удалить " + student.getInitials() + "?");
+        alert.showAndWait()
+                .filter(response -> response == ButtonType.OK)
+                .ifPresent(response -> RequestService.deleteStudent(student.getId()));
     }
 
     @FXML
