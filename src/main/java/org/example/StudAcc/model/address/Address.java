@@ -15,6 +15,7 @@ public class Address {
     private String street;
     private String houseNumber;
     private String flatNumber;
+    @Column(name = "`index`")
     private String index;
 
     @ManyToOne

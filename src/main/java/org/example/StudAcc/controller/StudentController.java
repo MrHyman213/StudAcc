@@ -55,6 +55,17 @@ public class StudentController {
         return service.getGroupBySpecId(id);
     }
 
+    @GetMapping("/group/all")
+    public List<Group> allGroups(){
+        return service.getAllGroups();
+    }
+
+    @GetMapping("/group/move")
+    public HttpStatus moveGroup(@RequestParam("out") String out, @RequestParam("in") String in){
+        service.moveGroup(out, in);
+        return HttpStatus.OK;
+    }
+
     @PostMapping("/group/new")
     public HttpStatus createGroup(@RequestBody GroupDTO dto) {
         service.createGroup(dto.getSpecId(), dto.getName());

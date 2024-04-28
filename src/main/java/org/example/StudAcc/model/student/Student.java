@@ -65,4 +65,13 @@ public class Student {
     public OrderNumber getOrderNumber(){
         return orderNumber;
     }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", patronymic='" + patronymic + '\'' +
+                '}';
+    }
 }

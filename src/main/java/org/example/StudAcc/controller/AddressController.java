@@ -73,14 +73,12 @@ public class AddressController {
     }
 
     @PostMapping("/new")
-    public HttpStatus create(@RequestBody AddressDTO dto){
-        service.create(service.mapToModel(dto));
-        return HttpStatus.CREATED;
+    public int create(@RequestBody AddressDTO dto){
+        return service.create(service.mapToModel(dto));
     }
 
     @PutMapping("/update")
     public HttpStatus update(@RequestParam("id") int id, @RequestBody AddressDTO dto){
-        System.out.println(dto);
         service.update(service.mapToModel(dto), id);
         return HttpStatus.ACCEPTED;
     }

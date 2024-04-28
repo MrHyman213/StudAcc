@@ -2,6 +2,7 @@ package org.example.StudAcc.DTO.student;
 
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -21,5 +22,5 @@ public class StudentDTO {
     private boolean akadem;
     private boolean sex;
     private boolean freeVisit;
-    private Date birthDate;
+    private LocalDate birthDate;
 }

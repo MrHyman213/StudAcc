@@ -88,8 +88,8 @@ public class AddressService {
     }
 
     @Transactional
-    public void create(Address address){
-        repository.save(address);
+    public int create(Address address){
+        return repository.save(address).getId();
     }
 
     @Transactional

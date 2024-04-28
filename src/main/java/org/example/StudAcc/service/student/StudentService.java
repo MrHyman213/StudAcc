@@ -1,6 +1,7 @@
 package org.example.StudAcc.service.student;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.StudAcc.DTO.student.ShortStudentDTO;
 import org.example.StudAcc.DTO.student.StudentDTO;
 import org.example.StudAcc.model.organization.Group;
@@ -10,15 +11,21 @@ import org.example.StudAcc.model.student.OrderNumber;
 import org.example.StudAcc.model.student.Student;
 import org.example.StudAcc.model.student.parent.Parent;
 import org.example.StudAcc.repository.student.StudentRepository;
+import org.example.StudAcc.service.address.AddressService;
 import org.example.StudAcc.service.organization.GroupService;
 import org.example.StudAcc.service.organization.SpecializationService;
 import org.example.StudAcc.utils.exceptions.ObjectNotFoundException;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -26,6 +33,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class StudentService {
 
     private final StudentRepository repository;
@@ -33,6 +41,7 @@ public class StudentService {
     private final SpecializationService specializationService;
     private final EducationService educationService;
     private final OrderNumberService orderNumberService;
+    private final AddressService addressService;
     private final ModelMapper mapper;
 
     public List<Specialization> getSpecializationList(){
@@ -57,6 +66,10 @@ public class StudentService {
     public void deleteSpecialization(int id){
         specializationService.delete(id);
     }
+
+    //group
+
+    ///////////////////////////////////////////////////////
 
     public List<Group> getGroupBySpecId(int specId){
         return specializationService.getById(specId).getGroupList();
@@ -85,6 +98,22 @@ public class StudentService {
         return repository.findByGroupOrderBySurname(group);
     }
 
+    @Transactional
+    public void moveGroup(String out, String in) {
+        Group inGroup = groupService.getByName(in);
+        Iterator<Student> outIterator = groupService.getByName(out).getStudents().iterator();
+        while (outIterator.hasNext()) {
+            Student student = outIterator.next();
+            inGroup.getStudents().add(student);
+            student.setGroup(inGroup);
+            outIterator.remove();
+        }
+    }
+
+    // student
+
+    /////////////////////////////////////////////////////////////
+
     public Student getById(int id) {
         try {
             return repository.findById(id).get();
@@ -94,7 +123,7 @@ public class StudentService {
     }
 
     public List<ShortStudentDTO> getStudentsByGroup(int id) {
-        return groupService.getById(id).getStudents().stream().map(this::modelToMap).collect(Collectors.toList());
+        return groupService.getById(id).getStudents().stream().map(this::modelToMap).sorted(Comparator.comparing(ShortStudentDTO::getSurname)).collect(Collectors.toList());
     }
 
     public List<Parent> getParents(int studentId) {
@@ -116,8 +145,8 @@ public class StudentService {
     public void delete(int id) {
         repository.deleteById(id);
     }
-
     //orders
+
     ////////////////////////////////////////////////////////////////////
 
     public List<OrderNumber> getOrderList() {
@@ -179,7 +208,7 @@ public class StudentService {
         return student;
     }
 
-    public Student mapToModel(StudentDTO dto){
+    public Student mapToModel(StudentDTO dto) {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Student student = mapper.map(dto, Student.class);
         if(dto.getEducationId() != 0)
@@ -188,10 +217,17 @@ public class StudentService {
             student.setGroup(groupService.getById(dto.getGroupId()));
         if(dto.getOrderNumberId() != 0)
             student.setOrderNumber(orderNumberService.getById(dto.getOrderNumberId()));
+        if (dto.getAddressId() != 0) {
+            student.setAddress(addressService.getById(dto.getAddressId()));
+        }
         return student;
     }
 
     public ShortStudentDTO modelToMap(Student student) {
         return mapper.map(student, ShortStudentDTO.class);
+    }
+
+    public List<Group> getAllGroups() {
+        return groupService.getAll();
     }
 }

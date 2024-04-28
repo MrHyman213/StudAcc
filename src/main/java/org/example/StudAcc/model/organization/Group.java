@@ -34,4 +34,12 @@ public class Group {
         this.name = name;
         this.specialization = specialization;
     }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

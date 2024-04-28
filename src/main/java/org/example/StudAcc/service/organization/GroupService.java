@@ -24,10 +24,10 @@ public class GroupService {
         return repository.findAll();
     }
 
-    public Group getByName(String name){
+    public Group getByName(String name) {
         try {
             return repository.findByName(name).get();
-        }catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             throw new GroupNotFoundException("Группа " + name + " не найдена.");
         }
     }
