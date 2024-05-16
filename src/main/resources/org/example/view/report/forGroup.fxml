@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="366.0" prefWidth="520.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controller.report.GroupReportController">
+   <children>
+      <Label fx:id="lbName" layoutX="14.0" layoutY="9.0" text="Название отчета">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="14.0" layoutY="44.0" text="Группа:">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="cbGroup" layoutX="106.0" layoutY="40.0" prefHeight="25.0" prefWidth="82.0" promptText="Группа" />
+      <Label layoutX="292.0" layoutY="18.0" text="Список преподавателей">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <Line endX="140.0" layoutX="283.0" layoutY="153.0" rotate="90.0" startX="-140.0" />
+      <ListView fx:id="employeeList" layoutX="292.0" layoutY="54.0" prefHeight="205.0" prefWidth="214.0" />
+      <ComboBox fx:id="cbEmployee" layoutX="292.0" layoutY="270.0" onAction="#employeeSelectedAct" prefHeight="25.0" prefWidth="214.0" promptText="Выбрать преподавателя" />
+      <Button layoutX="446.0" layoutY="16.0" mnemonicParsing="false" onAction="#delAct" text="Удалить" />
+      <Label layoutX="14.0" layoutY="76.0" text="Дисциплина: ">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="cbDiscipline" layoutX="107.0" layoutY="72.0" prefHeight="25.0" prefWidth="164.0" promptText="Выбрать дисциплину" />
+      <Label layoutX="14.0" layoutY="172.0" text="Дата начала: ">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="13.0" layoutY="204.0" text="Дата окончания: ">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <DatePicker fx:id="dpStartDate" layoutX="108.0" layoutY="168.0" prefHeight="25.0" prefWidth="164.0" />
+      <DatePicker fx:id="dpEndDate" layoutX="128.0" layoutY="200.0" prefHeight="25.0" prefWidth="144.0" />
+      <Button layoutX="413.0" layoutY="323.0" mnemonicParsing="false" onAction="#generateAct" text="Сформировать" />
+      <Button layoutX="336.0" layoutY="323.0" mnemonicParsing="false" onAction="#cancelAct" text="Отмена" />
+      <Label layoutX="14.0" layoutY="109.0" text="Семестр:">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="cbTerm" layoutX="106.0" layoutY="104.0" prefHeight="25.0" prefWidth="164.0" promptText="№ семестра" />
+      <Line endX="250.0" layoutX="260.0" layoutY="307.0" startX="-250.0" />
+      <TextField fx:id="tfProtocol" layoutX="128.0" layoutY="270.0" prefHeight="25.0" prefWidth="144.0" />
+      <Label layoutX="14.0" layoutY="273.0" text="№ Протокола: ">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="13.0" layoutY="139.0" text="Дата проведения:">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <DatePicker fx:id="dpDateEvent" layoutX="127.0" layoutY="135.0" prefHeight="25.0" prefWidth="144.0" />
+      <Label layoutX="15.0" layoutY="237.0" text="Год обучения: ">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <TextField fx:id="tfYearStudy" layoutX="127.0" layoutY="234.0" prefHeight="25.0" prefWidth="144.0" />
+   </children>
+</AnchorPane>

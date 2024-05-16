@@ -1,15 +1,16 @@
-package org.example.DTO.entries;
+package org.example.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.File;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Education implements Entry{
+public class ImportDTO {
 
-    private int id;
-    private String name;
-
+    private int groupId;
+    private File file;
 }

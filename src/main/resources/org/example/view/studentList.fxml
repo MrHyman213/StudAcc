@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.shape.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="root" prefHeight="600.0" prefWidth="560.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controller.GroupController">
+<AnchorPane fx:id="root" prefHeight="600.0" prefWidth="560.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controller.GroupController">
    <children>
-      <ComboBox fx:id="cbGroup" layoutX="14.0" layoutY="75.0" onAction="#isSelected" prefWidth="150.0" promptText="Группа" />
+      <ComboBox fx:id="cbGroup" layoutX="56.0" layoutY="75.0" onAction="#groupSelected" prefWidth="150.0" promptText="Группа" />
       <TableView fx:id="tvStudents" layoutX="17.0" layoutY="131.0" prefHeight="422.0" prefWidth="527.0">
         <columns>
           <TableColumn fx:id="clSurname" prefWidth="157.0" text="Фамилия" />
@@ -17,14 +19,20 @@
             <TableColumn fx:id="clPatronymic" prefWidth="198.0" text="Отчество" />
         </columns>
       </TableView>
-      <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#addAct" text="Добавить" />
-      <Button layoutX="122.0" layoutY="14.0" mnemonicParsing="false" onAction="#cartAct" text="Карточка" />
-      <Button layoutX="232.0" layoutY="14.0" mnemonicParsing="false" onAction="#delAct" text="Исключить" />
-      <Button layoutX="357.0" layoutY="14.0" mnemonicParsing="false" onAction="#moveAct" text="Перевести" />
-      <Button layoutX="475.0" layoutY="14.0" mnemonicParsing="false" onAction="#generateAct" text="Печать" />
+      <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#addAct" text="Добавить ➕" />
+      <Button layoutX="104.0" layoutY="14.0" mnemonicParsing="false" onAction="#cartAct" text="Карточка 📋" />
+      <Button layoutX="195.0" layoutY="14.0" mnemonicParsing="false" onAction="#delAct" text="Исключить ♻" />
+      <Button layoutX="298.0" layoutY="14.0" mnemonicParsing="false" onAction="#moveAct" text="Перевести ⏩" />
       <Line endX="430.0" layoutX="115.0" layoutY="61.0" startX="-100.0" />
       <Label fx:id="lbCount" layoutX="524.0" layoutY="80.0" prefHeight="21.0" prefWidth="20.0" text="counter" />
       <Line endX="430.0" layoutX="115.0" layoutY="117.0" startX="-100.0" />
-      <Button layoutX="478.0" layoutY="563.0" mnemonicParsing="false" onAction="#exitAct" text="Выход" />
+      <Button layoutX="478.0" layoutY="561.0" mnemonicParsing="false" onAction="#exitAct" text="Выход ❌" />
+      <ComboBox fx:id="cbReport" layoutX="396.0" layoutY="14.0" onAction="#reportSelected" prefHeight="25.0" prefWidth="150.0" promptText="Печать" />
+      <Button layoutX="213.0" layoutY="75.0" mnemonicParsing="false" onAction="#importAct" text="Импорт 📥" />
+      <Button layoutX="17.0" layoutY="72.0" mnemonicParsing="false" onAction="#updateAct" text="🔄">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>

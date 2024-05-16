@@ -1,18 +1,8 @@
-package org.example.DTO.student;
+package org.example.model.student;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.deser.std.NumberDeserializers;
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.jackson.Jacksonized;
-import org.example.DTO.entries.Education;
-import org.example.DTO.entries.Group;
-import org.example.DTO.entries.OrderNumber;
-
-import java.time.LocalDate;
-import java.util.Objects;
+import org.example.model.Entry;
 
 @Data
 @Jacksonized
@@ -32,9 +22,9 @@ public class Student {
     private Integer graduationYear;
     private String phone;
 
-    private Group group;
-    private OrderNumber orderNumber;
-    private Education education;
+    private Entry group;
+    private Entry orderNumber;
+    private Entry education;
     private Address address;
 
     public String getInitials(){

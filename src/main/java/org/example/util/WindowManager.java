@@ -3,6 +3,7 @@ package org.example.util;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -15,7 +16,7 @@ public class WindowManager {
 
     private static final String path = "/org/example/view/";
 
-    public static void open(String viewName, String title, Boolean resizable, Boolean withClose){
+    public static void open(String viewName, String title, Boolean resizable, Boolean withCloseButton){
         try {
             Pane pane = FXMLLoader.load(Objects.requireNonNull(WindowManager.class.getResource(path + viewName + ".fxml")));
             Stage stage = new Stage();
@@ -24,7 +25,7 @@ public class WindowManager {
             stage.setResizable(resizable);
             stage.resizableProperty().setValue(Boolean.FALSE);
             stage.initModality(Modality.APPLICATION_MODAL);
-            if(withClose)
+            if(withCloseButton)
                 stage.initStyle(StageStyle.UTILITY);
             else stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
@@ -35,5 +36,12 @@ public class WindowManager {
 
     public static void close(Node node){
         ((Stage) node.getScene().getWindow()).close();
+    }
+
+    public static void error(String header, String content){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.show();
     }
 }

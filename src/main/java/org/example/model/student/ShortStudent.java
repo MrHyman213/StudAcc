@@ -1,4 +1,4 @@
-package org.example.DTO.student;
+package org.example.model.student;
 
 import lombok.Data;
 
@@ -14,4 +14,8 @@ public class ShortStudent {
         return surname + " " + name + " " + patronymic;
     }
 
+    @Override
+    public String toString() {
+        return surname + " " + name + " " + patronymic;
+    }
 }

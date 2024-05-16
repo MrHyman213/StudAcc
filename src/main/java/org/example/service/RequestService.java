@@ -2,52 +2,56 @@ package org.example.service;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
-import org.example.DTO.RequestType;
-import org.example.DTO.entries.*;
+import javafx.application.Platform;
+import kong.unirest.Unirest;
+import org.example.DTO.EntryDTO;
 import org.example.DTO.Login;
-import org.example.DTO.student.Output.AddressDTO;
-import org.example.DTO.student.Output.StudentDTO;
-import org.example.DTO.student.Address;
-import org.example.DTO.student.ShortStudent;
-import org.example.DTO.student.Student;
+import org.example.DTO.ReportDTO;
+import org.example.DTO.TemplatesDTO;
+import org.example.DTO.student.AddressDTO;
+import org.example.DTO.student.StudentDTO;
+import org.example.model.Entry;
+import org.example.model.RequestType;
+import org.example.model.User;
+import org.example.model.student.ShortStudent;
+import org.example.model.student.Student;
 import org.example.util.EntryContainer;
+import org.example.util.FileManager;
 import org.example.util.RequestManager;
-import org.example.util.User;
 import org.example.util.exception.UnauthorizedException;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 
 public class RequestService {
+    private static final String IP_HOST = "localhost:8000";
 
-    private static User user = new User();
-    private static HttpClient client = HttpClient.newHttpClient();
+    private static final User user = new User();
+    private static final HttpClient client = HttpClient.newHttpClient();
     private static HttpRequest request;
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     static {
         objectMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         objectMapper.setVisibility(VisibilityChecker.Std.defaultInstance().withFieldVisibility(JsonAutoDetect.Visibility.ANY));
     }
-    private static final String URL = "http://localhost:8000/studacc/";
+    private static final String URL = "http://" + IP_HOST + "/studacc/";
 
     private static HttpResponse<String> request(RequestType type, String url, Object body) {
         try {
-            Map<String, String> headers = Map.of("Authorization", "Bearer " + user.getToken(), "Content-Type", "application/json");
-            switch (type){
+            Map<String, String> headers = Map.of("Authorization", "Bearer " + user.getToken(), "Content-Type", "application/json", "Accept-Encoding", "UTF-8");
+            switch (type) {
                 case GET -> request = RequestManager.get(URL + url, headers);
                 case POST -> request = RequestManager.post(URL + url, body, headers);
                 case PUT -> request = RequestManager.put(URL + url , body, headers);
@@ -65,7 +69,7 @@ public class RequestService {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
                 user.setToken(objectMapper.readValue(response.body(), Token.class).token);
-                user.setLogin(login);
+                user.setUsername(login);
                 user.setPassword(password);
                 return true;
             } else if (response.statusCode() == 401)
@@ -76,39 +80,45 @@ public class RequestService {
         return false;
     }
 
-    public static List<Specialization> getSpecList(){
-        List<Specialization> specList;
+    public static boolean isAdmin() {
+        List<Entry> roleList;
         try {
-            HttpResponse<String> response = request(RequestType.GET, "student/spec/list", null);
-            if(response.statusCode() == 401) throw new UnauthorizedException();
-            specList = objectMapper.readValue(response.body(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, Specialization.class));
+            HttpResponse<String> response = request(RequestType.GET, "info", null);
+            roleList = objectMapper.readValue(response.body(),
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, Entry.class));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        EntryContainer.put("specList", MappingService.convertToMap(specList));
-        return specList;
+        return roleList.stream().map(Entry::getName).toList().contains("ROLE_ADMIN");
     }
 
-    public static List<String> getGroupList(String specName){
-        List<Group> groupList;
+    public static List<Entry> getGroupList() {
+        List<Entry> groupList;
         try {
-            HttpResponse<String> response = request(RequestType.GET,
-                    "student/group/listBySpecId?id=" + EntryContainer.getIdByName("specList", specName), null);
-            if(response.statusCode() == 401) throw new UnauthorizedException();
+            HttpResponse<String> response = request(RequestType.GET, "list/group/all", null);
+            if (response.statusCode() == 401)
+                throw new UnauthorizedException();
             groupList = objectMapper.readValue(response.body(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, Group.class));
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, Entry.class));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        EntryContainer.put("groupList", MappingService.convertToMap(groupList));
-        return groupList.stream().map(Group::getName).collect(Collectors.toList());
+        EntryContainer.put("allGroupList", MappingService.convertToMap(groupList));
+        return groupList;
     }
 
-    public static List<ShortStudent> getStudentListByGroupName(String groupName) {
+    public static void moveGroup(String out, String in) {
+        HttpResponse<String> response = request(RequestType.GET, "list/group/move?out=" + out + "&in=" + in, null);
+        if (response.statusCode() == 401)
+            throw new UnauthorizedException();
+    }
+    //student
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static List<ShortStudent> getStudentListByGroupId(int groupId) {
         List<ShortStudent> students;
         try {
-            HttpResponse<String> response = request(RequestType.GET, "student/byGroupId?id=" + EntryContainer.getIdByName("groupList", groupName), null);
+            HttpResponse<String> response = request(RequestType.GET, "student/byGroupId?id=" + groupId, null);
             if(response.statusCode() == 401) throw new UnauthorizedException();
             students = objectMapper.readValue(response.body(),
                     objectMapper.getTypeFactory().constructCollectionType(List.class, ShortStudent.class));
@@ -117,6 +127,10 @@ public class RequestService {
         }
         EntryContainer.put("studentList", MappingService.convertStudentToMap(students));
         return students;
+    }
+
+    public static boolean checkGroup(int groupId) {
+        return request(RequestType.GET, "student/isEmpty?id=" + groupId, null).body().equals("true");
     }
 
     public static Student getStudentByInitials(String initials) {
@@ -133,66 +147,6 @@ public class RequestService {
         return student;
     }
 
-    public static List<String> getEducationList() {
-        List<Education> educations;
-        try {
-            HttpResponse<String> response = request(RequestType.GET, "student/education/list", null);
-            if(response.statusCode() == 401) throw new UnauthorizedException();
-            educations = objectMapper.readValue(response.body(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, Education.class));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        EntryContainer.put("educationList", MappingService.convertToMap(educations));
-        return educations.stream().map(Education::getName).collect(Collectors.toList());
-    }
-
-    public static List<String> getRegionList() {
-        List<Region> regionList;
-        try {
-            HttpResponse<String> response = request(RequestType.GET, "address/oblast/list", null);
-            if(response.statusCode() == 401)
-                throw new UnauthorizedException();
-            regionList = objectMapper.readValue(response.body(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, Region.class));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        EntryContainer.put("regionList", MappingService.convertToMap(regionList));
-        return regionList.stream().map(Region::getName).collect(Collectors.toList());
-    }
-
-
-    public static List<String> getDistrictListByRegion(String region) {
-        List<District> districtList;
-        try {
-            HttpResponse<String> response = request(RequestType.GET, "address/oblast/districts?id=" + EntryContainer.getIdByName("regionList", region), null);
-            if(response.statusCode() == 401) throw new UnauthorizedException();
-            districtList = objectMapper.readValue(response.body(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, District.class));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        EntryContainer.put("districtList", MappingService.convertToMap(districtList));
-        return districtList.stream().map(District::getName).collect(Collectors.toList());
-
-    }
-
-    public static List<String> getOrderList() {
-        List<OrderNumber> orderList;
-        try {
-            HttpResponse<String> response = request(RequestType.GET, "student/order/list", null);
-            if(response.statusCode() == 401)
-                throw new UnauthorizedException();
-            orderList = objectMapper.readValue(response.body(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, OrderNumber.class));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        EntryContainer.put("orderList", MappingService.convertToMap(orderList));
-        return orderList.stream().map(OrderNumber::getName).collect(Collectors.toList());
-    }
-
     public static void createStudent(StudentDTO student) {
         request(RequestType.POST, "student/new", student);
     }
@@ -201,7 +155,17 @@ public class RequestService {
         request(RequestType.PUT, "student/update?id=" + studentId, student);
     }
 
-    public static void updateAddress(AddressDTO address, int addressId){
+    public static void deleteStudent(int id) {
+        request(RequestType.DELETE, "student/delete?id=" + id, null);
+    }
+
+    public static void moveStudent(int studentId, int groupId){
+        request(RequestType.POST, "student/move?idStudent=" + studentId + "&idGroup=" + groupId, null);
+    }
+    //address
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static void updateAddress(AddressDTO address, int addressId) {
         request(RequestType.PUT, "address/update?id=" + addressId, address);
     }
 
@@ -212,29 +176,103 @@ public class RequestService {
         return 0;
     }
 
-    public static List<String> getGroupList() {
-        List<Group> groupList;
+    //list
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static List<Entry> getList(String selectedList, int idMainItem, boolean isSub) {
+        List<Entry> entryList;
+        if(isSub) {
+            entryList = getList("list/" + selectedList + "/list?id=" + idMainItem);
+            EntryContainer.put("subItemList", MappingService.convertToMap(entryList));
+        } else {
+            entryList = getList("list/" + selectedList.toLowerCase() + "/list");
+            EntryContainer.put("itemList", MappingService.convertToMap(entryList));
+        }
+        return entryList;
+    }
+
+    private static List<Entry> getList(String request){
         try {
-            HttpResponse<String> response = request(RequestType.GET, "student/group/all", null);
-            if (response.statusCode() == 401)
+            HttpResponse<String> response = request(RequestType.GET, request, null);
+            if(response.statusCode() == 401)
                 throw new UnauthorizedException();
-            groupList = objectMapper.readValue(response.body(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, Group.class));
+            return objectMapper.readValue(response.body(),
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, Entry.class));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        EntryContainer.put("allGroupList", MappingService.convertToMap(groupList));
-        return groupList.stream().map(Group::getName).collect(Collectors.toList());
     }
 
-    public static void moveGroup(String out, String in) {
-        HttpResponse<String> response = request(RequestType.GET, "student/group/move?out=" + out + "&in=" + in, null);
-        if (response.statusCode() == 401)
-            throw new UnauthorizedException();
+    public static void deleteList(String selectedList, int id) {
+        request(RequestType.DELETE, "list/" + selectedList + "/delete?id=" + id, null);
     }
 
-    public static void deleteStudent(int id) {
-        request(RequestType.DELETE, "student?id=" + id, null);
+    public static void addList(EntryDTO entry, String selectedList) {
+        request(RequestType.POST, "list/" + selectedList + "/new", entry);
+    }
+
+    public static void updateList(EntryDTO entry, String selectedList, int id){
+        request(RequestType.PUT, "list/" + selectedList + "/update?id=" + id, entry);
+    }
+
+    //report
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static void generateFile(int groupId, TemplatesDTO template, ReportDTO report) {
+        Map<String, String> headers = Map.of("Authorization", "Bearer " + user.getToken(), "Content-Type", "application/json", "Accept-Encoding", "UTF-8");
+        HttpRequest req = RequestManager.post(URL + "report/download?id=" + groupId + "&idTemplate=" + template.getId(), report, headers);
+        String path = (System.getProperty("user.home") + "/Downloads/StudAcc/" + LocalDate.now() + ".docx");
+        Platform.runLater(() -> {
+            try {
+                FileManager.createFile(client.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray()).get().body(), path);
+                ProcessBuilder builder = new ProcessBuilder("cmd", "/c", "start winword " + path.replace("/", "\\"));
+                try {
+                    builder.start();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public static List<TemplatesDTO> getReportList() {
+        List<TemplatesDTO> templateList;
+        try {
+            HttpResponse<String> response = request(RequestType.GET, "report/list", null);
+            if (response.statusCode() == 401)
+                throw new UnauthorizedException();
+            templateList = objectMapper.readValue(response.body(),
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, TemplatesDTO.class));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return templateList;
+    }
+
+    public static void importStudents(File selectedFile, int groupId) {
+        Unirest.post(URL + "report/csv/upload?id=" + groupId)
+                .header("Accept-Encoding", "multipart/form-data")
+                .header("Authorization", "Bearer " + user.getToken())
+                .field("file", selectedFile).asString();
+    }
+
+    //role
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static List<User> getUserList() {
+        List<User> userList;
+        try {
+            HttpResponse<String> response = request(RequestType.GET, "admin/list", null);
+            if (response.statusCode() == 401)
+                throw new UnauthorizedException();
+            userList = objectMapper.readValue(response.body(),
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, User.class));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return userList;
     }
 }
 class Token{

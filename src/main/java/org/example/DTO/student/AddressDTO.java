@@ -1,4 +1,4 @@
-package org.example.DTO.student.Output;
+package org.example.DTO.student;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

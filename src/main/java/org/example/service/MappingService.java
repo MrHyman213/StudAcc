@@ -1,11 +1,11 @@
 package org.example.service;
 
-import org.example.DTO.entries.Entry;
-import org.example.DTO.student.Address;
-import org.example.DTO.student.Output.AddressDTO;
-import org.example.DTO.student.Output.StudentDTO;
-import org.example.DTO.student.ShortStudent;
-import org.example.DTO.student.Student;
+import org.example.model.Entry;
+import org.example.model.student.Address;
+import org.example.DTO.student.AddressDTO;
+import org.example.DTO.student.StudentDTO;
+import org.example.model.student.ShortStudent;
+import org.example.model.student.Student;
 import org.example.util.EntryContainer;
 import org.modelmapper.ModelMapper;
 
@@ -39,7 +39,7 @@ public class MappingService {
         else
             dto.setAddressId(0);
         dto.setOrderNumberId(student.getOrderNumber().getId());
-        dto.setEducationId(student.getOrderNumber().getId());
+        dto.setEducationId(student.getEducation().getId());
         return dto;
     }
 

@@ -1,9 +1,9 @@
-package org.example.DTO.student;
+package org.example.model.student;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.DTO.entries.District;
+import org.example.model.Entry;
 
 
 @Data
@@ -12,7 +12,7 @@ import org.example.DTO.entries.District;
 public class Address {
 
     private int id;
-    private District district;
+    private Entry district;
     private String city;
     private String street;
     private String houseNumber;

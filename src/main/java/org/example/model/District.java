@@ -1,4 +1,4 @@
-package org.example.DTO.entries;
+package org.example.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class District implements Entry{
+public class District {
 
     private int id;
     private String name;
-    private Region region;
+    private Entry region;
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

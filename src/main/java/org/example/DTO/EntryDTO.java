@@ -1,6 +1,5 @@
-package org.example.DTO.entries;
+package org.example.DTO;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Region implements Entry{
+public class EntryDTO {
 
-    private int id;
+    private int parentId;
     private String name;
+
+    public EntryDTO(String name) {
+        this.name = name;
+    }
 }

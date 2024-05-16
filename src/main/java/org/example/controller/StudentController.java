@@ -6,11 +6,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import org.example.DTO.entries.*;
-import org.example.DTO.student.Address;
-import org.example.DTO.student.Student;
-import org.example.service.RequestService;
+import org.example.model.Entry;
+import org.example.model.student.Address;
+import org.example.model.student.Student;
 import org.example.service.MappingService;
+import org.example.service.RequestService;
 import org.example.util.EntryContainer;
 import org.example.util.WindowManager;
 
@@ -28,10 +28,10 @@ public class StudentController implements Initializable {
     private TextField tfHome;
 
     @FXML
-    private ComboBox<String> cbDistrict;
+    private ComboBox<Entry> cbDistrict;
 
     @FXML
-    private ComboBox<String> cbEducation;
+    private ComboBox<Entry> cbEducation;
 
     @FXML
     private TextField tfPhone;
@@ -61,7 +61,7 @@ public class StudentController implements Initializable {
     private Label lbGroup;
 
     @FXML
-    private ComboBox<String> cbOrderNumber;
+    private ComboBox<Entry> cbOrderNumber;
 
     @FXML
     private TextField tfCity;
@@ -76,7 +76,7 @@ public class StudentController implements Initializable {
     private Label lbInitials;
 
     @FXML
-    private ComboBox<String> cbRegion;
+    private ComboBox<Entry> cbRegion;
 
     @FXML
     private TextField tfPatronymic;
@@ -100,12 +100,12 @@ public class StudentController implements Initializable {
     private AnchorPane root;
 
     public static String INITIALS;
-    public static boolean isNew;
-    public static String groupName;
+    private static boolean isNew;
+    public static Entry selectedGroup;
 
-    public static void setGroup(String group){
+    public static void setGroup(Entry group){
         isNew = true;
-        groupName = group;
+        selectedGroup = group;
     }
 
     private static List<String> initList;
@@ -117,15 +117,14 @@ public class StudentController implements Initializable {
         if(!isNew) {
             initList = EntryContainer.getList("initList");
             index = EntryContainer.getIndexByName(initList, INITIALS);
-            initLists();
             setValues(RequestService.getStudentByInitials(INITIALS));
         } else {
             isNew = false;
             idAddress = 0;
-            lbGroup.setText("Группа: " + groupName);
+            lbGroup.setText("Группа: " + selectedGroup.getName());
             lbInitials.setText("Добавление студента");
-            initLists();
         }
+        initLists();
     }
 
     @FXML
@@ -135,12 +134,6 @@ public class StudentController implements Initializable {
 
     @FXML
     void nextAct(ActionEvent event) {
-//        tfCaseNumber.setOnKeyPressed(keyEvent -> {
-//            if(keyEvent.getCode() == KeyCode.KP_LEFT)
-//                prev();
-//            if(keyEvent.getCode() == KeyCode.KP_RIGHT)
-//                next();
-//        });
         next();
     }
 
@@ -168,25 +161,25 @@ public class StudentController implements Initializable {
 
     @FXML
     void regionSelect(ActionEvent event) {
-        if(cbRegion.getSelectionModel().getSelectedItem() == null || cbRegion.getSelectionModel().getSelectedItem().equals(""))
+        if(cbRegion.getSelectionModel().getSelectedItem() == null)
             cbDistrict.setItems(FXCollections.observableArrayList(Collections.emptyList()));
         else {
             cbDistrict.setItems(FXCollections.observableArrayList(
-                    RequestService.getDistrictListByRegion(cbRegion.getSelectionModel().getSelectedItem())
+                    RequestService.getList("district", cbRegion.getSelectionModel().getSelectedItem().getId(), true)
             ));
-            cbDistrict.setValue("");
+            cbDistrict.setValue(null);
         }
     }
 
     private void initLists(){
         cbOrderNumber.setItems(FXCollections.observableArrayList(
-                RequestService.getOrderList()
+                RequestService.getList("order", 0, false)
         ));
         cbSex.setItems(FXCollections.observableArrayList(EntryContainer.getList("sex")));
         cbEducation.setItems(FXCollections.observableArrayList(
-                RequestService.getEducationList()));
+                RequestService.getList("education", 0, false)));
         cbRegion.setItems(FXCollections.observableArrayList(
-                RequestService.getRegionList()
+                RequestService.getList("region", 0, false)
         ));
     }
 
@@ -195,7 +188,7 @@ public class StudentController implements Initializable {
         try {
             student.setId(EntryContainer.getIdByName("studentList", lbInitials.getText().replace("Студент: ", "")));
         } catch (NullPointerException ignored){}
-        student.setGroup(new Group(EntryContainer.getIdByName("groupList", lbGroup.getText().replace("Группа: ", "")), lbGroup.getText().replace("Группа: ", "")));
+        student.setGroup(selectedGroup);
         student.setSurname(tfSurname.getText());
         student.setName(tfName.getText());
         student.setPatronymic(tfPatronymic.getText());
@@ -207,20 +200,15 @@ public class StudentController implements Initializable {
 
         student.setSnils(tfSnils.getText());
         student.setBirthDate(dpBirthDate.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        String orderNumber = cbOrderNumber.getSelectionModel().getSelectedItem();
-        String education = cbEducation.getSelectionModel().getSelectedItem();
         try {
-            String district = cbDistrict.getSelectionModel().getSelectedItem();
-            String region = cbRegion.getSelectionModel().getSelectedItem();
             student.setAddress(new Address(idAddress,
-                    new District(EntryContainer.getIdByName("districtList", district),
-                            district, new Region(EntryContainer.getIdByName("regionList", region), region)),
-                    tfCity.getText(), tfStreet.getText(), tfHome.getText(), tfFlat.getText(), tfIndex.getText()));
+                    cbDistrict.getSelectionModel().getSelectedItem(), tfCity.getText(),
+                    tfStreet.getText(), tfHome.getText(), tfFlat.getText(), tfIndex.getText()));
         } catch (NullPointerException e){
             student.setAddress(null);
         }
-        student.setOrderNumber(new OrderNumber(EntryContainer.getIdByName("orderList", orderNumber), orderNumber));
-        student.setEducation(new Education(EntryContainer.getIdByName("educationList", education), education));
+        student.setOrderNumber(cbOrderNumber.getSelectionModel().getSelectedItem());
+        student.setEducation(cbEducation.getSelectionModel().getSelectedItem());
         student.setPhone(tfPhone.getText());
         return student;
     }
@@ -236,10 +224,10 @@ public class StudentController implements Initializable {
         tfPatronymic.setText(student.getPatronymic());
         cbAcadem.setSelected(student.isAkadem());
         cbFree.setSelected(student.isFreeVisit());
-        cbOrderNumber.setValue(student.getOrderNumber().getName());
+        cbOrderNumber.setValue(student.getOrderNumber());
         try {
             cbSex.setValue(getSex(student.getSex()));
-            cbEducation.setValue(student.getEducation().getName());
+            cbEducation.setValue(student.getEducation());
             dpBirthDate.setValue(LocalDate.parse(student.getBirthDate()));
             tfGraduationYear.setText(String.valueOf(student.getGraduationYear()));
             tfSnils.setText(student.getSnils());
@@ -250,27 +238,25 @@ public class StudentController implements Initializable {
         try {
             Address address = student.getAddress();
             if(address != null) {
-                String region = address.getDistrict().getRegion().getName();
-                cbDistrict.setItems(FXCollections.observableArrayList(
-                        RequestService.getDistrictListByRegion(region)
-                ));
-                cbRegion.setValue(region);
-                cbDistrict.setValue(address.getDistrict().getName());
+                cbRegion.setValue(address.getDistrict().getSubEntry());
+                cbDistrict.setValue(address.getDistrict());
                 tfIndex.setText(address.getIndex());
                 tfCity.setText(address.getCity());
                 tfStreet.setText(address.getStreet());
                 tfHome.setText(address.getHouseNumber());
                 tfFlat.setText(address.getFlatNumber());
             } else {
-                cbDistrict.setValue("");
-                cbRegion.setValue("");
+                cbDistrict.setValue(null);
+                cbRegion.setValue(null);
                 tfIndex.setText("");
                 tfCity.setText("");
                 tfStreet.setText("");
                 tfHome.setText("");
                 tfFlat.setText("");
             }
-        } catch (NullPointerException ignored) {}
+        } catch (NullPointerException ignored) {
+            ignored.printStackTrace();
+        }
         btNext.setDisable(index == initList.size()-1);
         btPrev.setDisable(index == 0);
     }

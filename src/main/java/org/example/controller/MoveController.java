@@ -4,9 +4,11 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
+import org.example.model.Entry;
+import org.example.model.student.ShortStudent;
 import org.example.service.RequestService;
+import org.example.util.WindowManager;
 
 import java.net.URL;
 import java.util.List;
@@ -16,29 +18,35 @@ import java.util.ResourceBundle;
 public class MoveController implements Initializable {
 
     @FXML
-    private ListView<String> listIn;
+    private ListView<Entry> listIn;
 
     @FXML
-    private ListView<String> listOut;
+    private ListView<Entry> listOut;
+
+    private static boolean isSingle = false;
+    private static ShortStudent student;
+
+    public static void setStudent(ShortStudent selectedStudent){
+        isSingle = true;
+        student = selectedStudent;
+    }
 
     @FXML
     void moveAct(ActionEvent event) {
-        String in = listIn.getSelectionModel().getSelectedItem();
-        String out = listOut.getSelectionModel().getSelectedItem();
-        if(!Objects.equals(in, out)){
-            if (RequestService.getStudentListByGroupName(in).isEmpty())
-                RequestService.moveGroup(out, in);
-            else
-                error("В группе есть студенты.", "Невозможно перевести студентов в группу, где уже есть студенты.");
-        } else
-            error("Выбраны одинаковые группы.", "Невозможно перевести студентов в ту же группу.");
-    }
-
-    public void error(String header, String content){
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.show();
+        Entry in = listIn.getSelectionModel().getSelectedItem();
+        if(isSingle){
+            RequestService.moveStudent(student.getId(), in.getId());
+            isSingle = false;
+        } else {
+            Entry out = listOut.getSelectionModel().getSelectedItem();
+            if (!Objects.equals(in, out)) {
+                if (RequestService.checkGroup(in.getId()))
+                    RequestService.moveGroup(out.getName(), in.getName());
+                else
+                    WindowManager.error("В группе есть студенты.", "Невозможно перевести студентов в группу, где уже есть студенты.");
+            } else
+                WindowManager.error("Выбраны одинаковые группы.", "Невозможно перевести студентов в ту же группу.");
+        }
     }
 
     @Override
@@ -47,8 +55,11 @@ public class MoveController implements Initializable {
     }
 
     public void initLists(){
-        List<String> groupList = RequestService.getGroupList();
+        List<Entry> groupList = RequestService.getGroupList();
         listIn.setItems(FXCollections.observableList(groupList));
-        listOut.setItems(FXCollections.observableList(groupList));
+        if(!isSingle)
+            listOut.setItems(FXCollections.observableList(groupList));
+        else
+            listOut.setVisible(false);
     }
 }
