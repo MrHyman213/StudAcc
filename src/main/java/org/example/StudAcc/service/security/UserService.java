@@ -1,6 +1,7 @@
 package org.example.StudAcc.service.security;
 
 import org.example.StudAcc.DTO.acc.RegistrationUserDto;
+import org.example.StudAcc.model.acc.Role;
 import org.example.StudAcc.model.acc.User;
 import org.example.StudAcc.repository.acc.UserRepository;
 import org.example.StudAcc.utils.exceptions.UserNotFoundException;
@@ -50,7 +51,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void createNewUser(RegistrationUserDto userDto){
         User user = modelMapper.map(userDto, User.class);
-        user.setRoles(List.of(roleService.getUserRole()));
+        user.setRoles(userDto.getRoleList().stream().map(roleService::getById).collect(Collectors.toList()));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
@@ -61,5 +62,19 @@ public class UserService implements UserDetailsService {
 
     public User findById(int id){
         return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+    }
+
+    @Transactional
+    public void updateUser(User user, int id) {
+        user.setId(id);
+        userRepository.save(user);
+    }
+
+    public List<Role> getInfoByUsername(String username) {
+        return findByUsername(username).orElse(null).getRoles();
+    }
+
+    public List<User> getList() {
+        return userRepository.findAll();
     }
 }

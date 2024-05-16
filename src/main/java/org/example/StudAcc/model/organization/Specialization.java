@@ -17,7 +17,7 @@ public class Specialization {
     private int id;
     private String name;
 
-    @ManyToMany(mappedBy = "specializationList")
+    @OneToMany(mappedBy = "specialization")
     @JsonIgnore
     private List<Discipline> disciplineList;
 

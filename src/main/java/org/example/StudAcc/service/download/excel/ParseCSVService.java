@@ -29,16 +29,20 @@ public class ParseCSVService {
     private final String processed = path + "processed\\";
     private final StudentService studentService;
 
-    public void process(MultipartFile file){
+    public void process(MultipartFile file, int groupId){
         upload(file);
         String fileName = file.getOriginalFilename();
         String newDir = processed + LocalDate.now().format(DateTimeFormatter.ISO_DATE) + "\\";
         List<Student> studentList = ExcelParser.csvToModel(uploaded);
         if (!studentList.isEmpty()) {
-            createDirectory(newDir);
-            relocateFile(uploaded + fileName,
-                    newDir + fileName);
-            studentService.processStudents(studentList);
+            try {
+                Files.createDirectories(Paths.get(newDir));
+                relocateFile(uploaded + fileName,
+                        newDir + fileName);
+                studentService.processStudents(studentList, groupId);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -55,20 +59,9 @@ public class ParseCSVService {
         } else throw new FileFormatException("Не верный формат файла.");
     }
 
-    private void relocateFile(String oldPath, String newPath){
-        File file = new File(oldPath);
+    private void relocateFile(String oldPath, String newPath) {
         try {
             Files.move(Paths.get(oldPath), Paths.get(newPath));
-            file.delete();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void createDirectory(String path){
-        try {
-            if(Paths.get(path) != null)
-                Files.createDirectory(Path.of(path));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -93,7 +86,7 @@ public class ParseCSVService {
         }
     }
 
-    private void copyFile(String path){
+    private void copyFile(String path) {
         java.nio.file.Path destFile = Paths.get(path);
         SeekableByteChannel destFileChannel;
         try {

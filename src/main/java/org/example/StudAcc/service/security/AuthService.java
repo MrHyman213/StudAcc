@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.StudAcc.DTO.acc.JwtRequest;
 import org.example.StudAcc.DTO.acc.JwtResponse;
 import org.example.StudAcc.DTO.acc.RegistrationUserDto;
+import org.example.StudAcc.model.acc.Role;
 import org.example.StudAcc.utils.BodyError;
 import org.example.StudAcc.utils.JwtUtils;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,10 +37,14 @@ public class AuthService {
     }
 
     public ResponseEntity<?> createNewUser(RegistrationUserDto registrationUserDto) {
-        if (userService.findByUsername(registrationUserDto.getUsername()).isPresent()) {
+        if (userService.findByUsername(registrationUserDto.getLogin()).isPresent()) {
             return new ResponseEntity<>(new BodyError(HttpStatus.BAD_REQUEST.value(), "Пользователь с указанным именем уже существует"), HttpStatus.BAD_REQUEST);
         }
         userService.createNewUser(registrationUserDto);
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    public List<Role> getRolesByUsername(String username){
+        return userService.getInfoByUsername(username);
     }
 }

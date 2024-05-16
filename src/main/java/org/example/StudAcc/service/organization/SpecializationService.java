@@ -34,6 +34,13 @@ public class SpecializationService {
         }
     }
 
+    public Specialization getByName(String name) {
+        try {
+            return repository.findByName(name).get();
+        } catch (NoSuchElementException e){
+            throw new SpecializationNotFoundException("Специальность " + name + " не найдена.");
+        }
+    }
 
     @Transactional
     public void create(String name){

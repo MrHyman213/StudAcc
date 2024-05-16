@@ -1,14 +1,13 @@
 package org.example.StudAcc.service.download;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FilenameUtils;
 import org.example.StudAcc.DTO.ReportDTO;
 import org.example.StudAcc.DTO.TemplatesDTO;
 import org.example.StudAcc.model.download.Path;
 import org.example.StudAcc.model.student.Student;
 import org.example.StudAcc.repository.download.PathRepository;
+import org.example.StudAcc.service.ListService;
 import org.example.StudAcc.service.organization.GroupService;
-import org.example.StudAcc.service.organization.OrganizationService;
 import org.example.StudAcc.service.student.StudentService;
 import org.example.StudAcc.utils.GenerateDocFromTemplate;
 import org.example.StudAcc.utils.exceptions.download.FileFormatException;
@@ -26,13 +25,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,14 +47,14 @@ public class GeneratingFilesByTemplateService {
     private final PathRepository repository;
     private final GroupService groupService;
     private final StudentService studentService;
-    private final OrganizationService organizationService;
+    private final ListService listService;
     private final PathRepository pathRepository;
     private final ModelMapper mapper;
     @Lazy
     private final GenerateDocFromTemplate generator;
     private static final String PATH_TEMPLATE = "src\\main\\document\\word\\template\\";
     private static  final String PATH_TEST = "src\\main\\document\\word\\";
-    private Map<String, String> keyWords = new HashMap<>();
+    private final Map<String, String> keyWords = new HashMap<>();
 
     @Bean
     public Map<String, String> getKeyWords(){
@@ -92,29 +94,31 @@ public class GeneratingFilesByTemplateService {
 
     private void setKeyWordsOnText(ReportDTO dto, int groupId) {
         keyWords.put("group", groupService.getById(groupId).getName());
-        keyWords.put("dateEvent", new SimpleDateFormat("yyyy.MM.dd").format(dto.getDateEvent()));
-        if(dto.getEmployeeIdList() != null){
+        keyWords.put("dateEvent", dto.getDateEvent().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        if (dto.getEmployeeIdList() != null && !dto.getEmployeeIdList().isEmpty()) {
             List<String> employeeList = new ArrayList<>();
-            for(int id: dto.getEmployeeIdList()) {
-                if(id != 0)
-                    employeeList.add(organizationService.getEmployee(id).getShortName());
+            for (int id : dto.getEmployeeIdList()) {
+                if (id != 0)
+                    employeeList.add(listService.getEmployee(id).getShortName());
             }
             StringBuilder builder = new StringBuilder();
             employeeList.forEach(str -> builder.append(str).append(", "));
             builder.replace(builder.length() - 2, builder.length() - 1, "");
             keyWords.put("teacherList", builder.toString());
         }
-        if(dto.getDisciplineId() != null)
-            keyWords.put("discipline", organizationService.getDiscipline(dto.getDisciplineId()).getName());
+        if (dto.getDisciplineId() != null)
+            keyWords.put("discipline", listService.getDiscipline(dto.getDisciplineId()).getName());
+        keyWords.put("numberProtocol", dto.getNumberProtocol());
     }
 
     private void setKeyWordsOnText(ReportDTO dto){
+        System.out.println(dto);
         keyWords.put("group", studentService.getById(dto.getStudentId()).getGroup().getName());
-        if(dto.getDisciplineId() != null)
-            keyWords.put("discipline", organizationService.getDiscipline(dto.getDisciplineId()).getName());
+        keyWords.put("discipline", listService.getDiscipline(dto.getDisciplineId()).getName());
         keyWords.put("shortInit", studentService.getById(dto.getStudentId()).getShortName());
         keyWords.put("semester", dto.getSemester());
         keyWords.put("yearStudy", dto.getYearStudy());
+        keyWords.put("numberProtocol", dto.getNumberProtocol());
     }
 
     public ResponseEntity<Resource> downloadTemplate(int id){
@@ -127,6 +131,7 @@ public class GeneratingFilesByTemplateService {
         HttpHeaders header = new HttpHeaders();
         header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(name, StandardCharsets.UTF_8));
         header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        header.add("Accept-Encoding", "UTF-8");
         header.add("Pragma", "no-cache");
         header.add("Expires", "0");
         ByteArrayResource resource;

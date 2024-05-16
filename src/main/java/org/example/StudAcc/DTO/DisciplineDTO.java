@@ -12,5 +12,5 @@ import java.util.List;
 public class DisciplineDTO {
 
     private String name;
-    private List<String> specializations;
+    private int parentId;
 }

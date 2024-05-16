@@ -1,5 +1,6 @@
 package org.example.StudAcc.model.acc;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ public class User {
     private int id;
     @Column(name = "login")
     private String username;
+    @JsonIgnore
     private String password;
     private String phone;
     private String email;

@@ -18,10 +18,10 @@ public class District {
 
     @ManyToOne
     @JoinColumn(name = "id_region", referencedColumnName = "id")
-    private Region region;
+    private Region subEntry;
 
     public District(String name, Region region) {
         this.name = name;
-        this.region = region;
+        this.subEntry = region;
     }
 }

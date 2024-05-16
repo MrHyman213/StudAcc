@@ -3,6 +3,7 @@ package org.example.StudAcc.config;
 import lombok.RequiredArgsConstructor;
 import org.example.StudAcc.service.security.UserService;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CharacterEncodingFilter;
+
+import java.util.logging.Filter;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
@@ -35,7 +39,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .cors(Customizer.withDefaults())
                 .authorizeRequests()
-                .antMatchers("/student/**", "/report/**", "/address/**", "/org/**").authenticated()
+                .antMatchers("/student/**", "/report/**", "/address/**", "/org/**", "/list/**", "/user/**").authenticated()
                 .antMatchers(HttpMethod.POST, "/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
                 .and()
@@ -54,6 +58,17 @@ public class SecurityConfig {
         dao.setPasswordEncoder(passwordEncoder());
         dao.setUserDetailsService(userService);
         return dao;
+    }
+
+    @Bean
+    public FilterRegistrationBean registrationBean(){
+        CharacterEncodingFilter filter = new CharacterEncodingFilter();
+        filter.setEncoding("UTF-8");
+        filter.setForceEncoding(true);
+        FilterRegistrationBean bean = new FilterRegistrationBean();
+        bean.setFilter(filter);
+        bean.addUrlPatterns("/**");
+        return bean;
     }
 
     @Bean

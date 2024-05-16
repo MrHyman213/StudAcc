@@ -12,6 +12,5 @@ import java.util.List;
 public class EmployeeDTO {
 
     private String name;
-    private List<String> posts;
     private List<DisciplineDTO> disciplineList;
 }

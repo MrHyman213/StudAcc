@@ -13,12 +13,11 @@ public class Student {
     private LocalDate birthDate;
     private Boolean sex;
     private String snils;
-    private String group;
     private String orderNumber; // id_order_number Номер приказа
     private String dateOrder; // Дата приказа
     private int graduationYear;
     private String education;
-    private String address;
+    private String phone;
 
     public void setSex(String sex){
         this.sex = String.valueOf(sex.charAt(0)).equalsIgnoreCase("ж");

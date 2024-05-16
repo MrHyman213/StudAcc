@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.Null;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -61,10 +62,11 @@ public class GenerateDocFromTemplate {
     }
 
     public void replaceTextInDocumentBody() {
+        System.out.println(keyWords);
         List<XWPFParagraph> paragraphs = readingDoc.getParagraphs();
         for(int i = 0; i < paragraphs.size(); i++) {
             try {
-                if (paragraphs.get(i).getRuns().get(0).getText(0).contains("${afterTable}")) {
+                if (paragraphs.get(i).getRuns().get(0).text().contains("${afterTable}")) {
                     addParagraphsAfterTable(paragraphs, ++i);
                     break;
                 }
@@ -74,11 +76,14 @@ public class GenerateDocFromTemplate {
             for (XWPFRun run : paragraphs.get(i).getRuns()) {
                 XWPFRun mainRun = mainParagraph.createRun();
                 setStylesForRun(run, mainRun);
-                String text = run.getText(0);
+                String text = run.text();
                 for (Map.Entry<String, String> entry : keyWords.entrySet()) {
-                    if (text.contains("${" + entry.getKey() + "}")) {
-                        text = text.replace("${" + entry.getKey() + "}", entry.getValue());
-                    }
+                    try {
+                        System.out.println(text);
+                        if (text.contains("${" + entry.getKey() + "}")) {
+                            text = text.replace("${" + entry.getKey() + "}", entry.getValue());
+                        }
+                    } catch (NullPointerException ignored){}
                 }
                 mainRun.setText(text);
             }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.StudAcc.DTO.AddressDTO;
 import org.example.StudAcc.model.address.*;
 import org.example.StudAcc.repository.address.AddressRepository;
+import org.example.StudAcc.service.ListService;
 import org.example.StudAcc.utils.exceptions.address.AddressNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -18,64 +19,12 @@ import java.util.NoSuchElementException;
 public class AddressService {
 
     private final AddressRepository repository;
-    private final RegionService oblastService;
-    private final DistrictService districtService;
-
+    private final ListService listService;
     private final ModelMapper mapper;
 
-    // Default methods
-    // Области
-    ////////////////////////////////////////////////////////////////////
-    public List<Region> getRegionList(){
-        return oblastService.getAll();
-    }
-
-    @Transactional
-    public void createRegion(String name) {
-        oblastService.create(name);
-    }
-
-    @Transactional
-    public void updateRegion(int id, String name, int typeId){
-        oblastService.getById(id).setName(name);
-    }
-
-    @Transactional
-    public void deleteRegion(int id){
-        oblastService.delete(id);
-    }
-
-    public Region getRegionById(int id){
-        return oblastService.getById(id);
-    }
-
-    // Районы
-    ////////////////////////////////////////////////////////////////////
-    public District getDistrictById(int id){
-        return districtService.getById(id);
-    }
-
-    @Transactional
-    public void createDistrict(String name, int parentId) {
-        districtService.create(name, getRegionById(parentId));
-    }
-
-    @Transactional
-    public void updateDistrict(String name, int id, int typeId){
-        getDistrictById(id).setName(name);
-    }
-
-    @Transactional
-    public void deleteDistrict(int id){
-        District district = getDistrictById(id);
-        district.getRegion().getDistrictList().remove(district);
-        districtService.delete(id);
-    }
-
-    // Address
     public Address mapToModel(AddressDTO dto){
         Address address = mapper.map(dto, Address.class);
-        address.setDistrict(getDistrictById(dto.getIdDistrict()));
+        address.setDistrict(listService.getDistrictById(dto.getIdDistrict()));
         return address;
     }
 

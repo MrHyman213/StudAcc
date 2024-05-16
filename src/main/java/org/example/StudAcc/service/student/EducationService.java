@@ -23,10 +23,10 @@ public class EducationService {
         return repository.findAll();
     }
 
-    public Education getById(int id){
+    public Education getById(int id) {
         try {
             return repository.findById(id).get();
-        } catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             throw new EducationNotFoundException("Образование с идентификатором " + id + " не найден.");
         }
     }

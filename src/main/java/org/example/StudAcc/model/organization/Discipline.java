@@ -14,22 +14,10 @@ public class Discipline {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
-    @ManyToMany
-    @JoinTable(
-            name = "discipline_teacher",
-            joinColumns = @JoinColumn(name = "id_discipline", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "id_teacher", referencedColumnName = "id")
-    )
-    @JsonIgnore
-    private List<Employee> teachers;
 
-    @ManyToMany
-    @JoinTable(
-            name = "specialization_discipline",
-            joinColumns = @JoinColumn(name = "id_discipline", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "id_specialization", referencedColumnName = "id")
-    )
+    @ManyToOne
     @JsonIgnore
-    private List<Specialization> specializationList;
+    @JoinColumn(name = "id_spec", referencedColumnName = "id")
+    private Specialization specialization;
 
 }

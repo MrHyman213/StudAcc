@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -62,20 +63,18 @@ public class ExcelParser {
             case "Дата рождения" -> student.setBirthDate(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd.MM.yyyy")));
             case "Пол" -> student.setSex(value);
             case "СНИЛС" -> student.setSnils(value);
-            case "Группа" -> student.setGroup(value);
             case "№ приказа" -> student.setOrderNumber(value);
             case "Дата приказа" -> student.setDateOrder(value);
             case "Дата окончания предыдущего обучения" -> student.setGraduationYear(Integer.parseInt(value.substring(6)));
             case "Образование" -> student.setEducation(value);
-            case "Адрес места жительства" -> student.setAddress(value);
+            case "Телефон" -> student.setPhone(value);
         }
     }
 
     private static void setPositions(List<String> data){
         String[] columns = data.get(0).split(";");
-        container.addPosition(0, columns[0].substring(1));
-        for (int i = 1; i < columns.length; i++)
-            container.addPosition(i, columns[i]);
+        for (int i = 0; i < columns.length; i++)
+            container.addPosition(i, columns[i].replace("[^\\\\p{L}]", ""));
         data.remove(0);
     }
 
@@ -95,7 +94,7 @@ public class ExcelParser {
     private static List<String> readCSV(String path){
         try {
             return Files.lines(
-                    Path.of(path), Charset.forName("UTF-8")).collect(Collectors.toList());
+                    Path.of(path), Charset.forName("windows-1251")).collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

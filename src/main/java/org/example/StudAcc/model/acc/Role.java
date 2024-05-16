@@ -1,5 +1,6 @@
 package org.example.StudAcc.model.acc;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -14,6 +15,7 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private List<User> users;
 }

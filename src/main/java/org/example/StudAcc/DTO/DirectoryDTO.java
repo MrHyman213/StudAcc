@@ -8,6 +8,5 @@ import lombok.NoArgsConstructor;
 public class DirectoryDTO {
 
     private int parentId;
-    private int typeId;
     private String name;
 }

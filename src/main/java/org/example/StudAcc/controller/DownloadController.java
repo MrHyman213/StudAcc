@@ -22,7 +22,7 @@ public class DownloadController {
     private final GeneratingFilesByTemplateService templateService;
     private final ParseCSVService parseCSVService;
 
-    @GetMapping("/listAll")
+    @GetMapping("/list")
     public List<TemplatesDTO> templateList(){
         return templateService.getTemplates();
     }
@@ -69,8 +69,8 @@ public class DownloadController {
     // Excel
 
     @PostMapping("/csv/upload")
-    public HttpStatus uploadCSV(@RequestParam("file") MultipartFile file){
-        parseCSVService.process(file);
+    public HttpStatus uploadCSV(@RequestParam("id") int groupId, @RequestParam("file") MultipartFile file){
+        parseCSVService.process(file, groupId);
         return HttpStatus.ACCEPTED;
     }
 

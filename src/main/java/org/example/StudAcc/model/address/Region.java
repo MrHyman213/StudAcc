@@ -18,7 +18,7 @@ public class Region {
     private String name;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "region")
+    @OneToMany(mappedBy = "subEntry")
     private List<District> districtList;
 
     public Region(String name){

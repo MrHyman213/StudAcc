@@ -20,53 +20,6 @@ public class AddressController {
 
     private final AddressService service;
 
-    @GetMapping("/oblast/list")
-    public List<Region> regionList() {
-        return service.getRegionList();
-    }
-
-    @GetMapping("/oblast/districts")
-    public List<District> districtListByOblast(@RequestParam("id")int id){
-        return service.getRegionById(id).getDistrictList();
-    }
-
-    @PostMapping("/oblast/new")
-    public HttpStatus newOblast(@RequestBody DirectoryDTO dto) {
-        service.createRegion(dto.getName());
-        return HttpStatus.CREATED;
-    }
-
-    @PutMapping("/oblast/{id}")
-    public HttpStatus updateOblast(@PathVariable("id")int id, @RequestBody DirectoryDTO dto){
-        service.updateRegion(id, dto.getName(), dto.getTypeId());
-        return HttpStatus.ACCEPTED;
-    }
-
-    @DeleteMapping("/oblast/{id}")
-    public HttpStatus deleteOblast(@PathVariable("id")int id){
-        service.deleteRegion(id);
-        return HttpStatus.OK;
-    }
-
-    @PostMapping("/district/new")
-    public HttpStatus newDistrict(@RequestBody DirectoryDTO dto){
-        service.createDistrict(dto.getName(), dto.getParentId());
-        return HttpStatus.ACCEPTED;
-    }
-
-    @PutMapping("/district/{id}")
-    public HttpStatus updateDistrict(@PathVariable("id")int id, @RequestBody DirectoryDTO dto){
-        service.updateDistrict(dto.getName(), id, dto.getTypeId());
-        return HttpStatus.ACCEPTED;
-    }
-
-    @DeleteMapping("/district/{id}")
-    public HttpStatus deleteDistrict(@PathVariable("id") int id){
-        service.deleteDistrict(id);
-        return HttpStatus.OK;
-    }
-
-
     @GetMapping
     public Address byId(@RequestParam("id") int id){
         return service.getById(id);

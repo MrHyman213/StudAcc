@@ -3,6 +3,7 @@ package org.example.StudAcc.DTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -10,12 +11,13 @@ import java.util.List;
 @NoArgsConstructor
 public class ReportDTO {
 
-    private Date dateEvent;
+    private LocalDate dateEvent;
     private List<Integer> employeeIdList;
     private Integer disciplineId;
     private Integer studentId;
     private String semester;
     private String yearStudy;
-    private Date dateStart;
-    private Date dateEnd;
+    private String numberProtocol;
+    private LocalDate dateStart;
+    private LocalDate dateEnd;
 }
