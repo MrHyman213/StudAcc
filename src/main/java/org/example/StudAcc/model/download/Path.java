@@ -19,10 +19,12 @@ public class Path {
     private String name;
     private String path;
     private boolean docType = false;
+    private boolean onClick = false;
 
-    public Path(String name, String path, boolean docType) {
+    public Path(String name, String path, boolean docType, boolean onClick) {
         this.name = name;
         this.path = path;
         this.docType = docType;
+        this.onClick = onClick;
     }
 }

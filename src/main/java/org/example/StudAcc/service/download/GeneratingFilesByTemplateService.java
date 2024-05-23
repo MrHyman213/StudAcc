@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.Null;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -94,7 +95,9 @@ public class GeneratingFilesByTemplateService {
 
     private void setKeyWordsOnText(ReportDTO dto, int groupId) {
         keyWords.put("group", groupService.getById(groupId).getName());
-        keyWords.put("dateEvent", dto.getDateEvent().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        try {
+            keyWords.put("dateEvent", dto.getDateEvent().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        } catch (NullPointerException ignored) {}
         if (dto.getEmployeeIdList() != null && !dto.getEmployeeIdList().isEmpty()) {
             List<String> employeeList = new ArrayList<>();
             for (int id : dto.getEmployeeIdList()) {
@@ -148,7 +151,7 @@ public class GeneratingFilesByTemplateService {
     }
 
     @Transactional
-    public void createNewTemplate(MultipartFile file, String name, boolean docType){
+    public void createNewTemplate(MultipartFile file, String name, boolean docType, boolean onClick){
         String fileName = file.getOriginalFilename();
         int dotCount = 0;
         assert fileName != null;
@@ -159,7 +162,7 @@ public class GeneratingFilesByTemplateService {
                 if (!contains(file.getOriginalFilename())){
                     try{
                         createFile(file.getBytes(), fileName);
-                        createPath(name, fileName, docType);
+                        createPath(name, fileName, docType, onClick);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -221,8 +224,8 @@ public class GeneratingFilesByTemplateService {
     }
 
     @Transactional
-    private void createPath(String name, String path, boolean docType){
-        pathRepository.save(new Path(name, path, docType));
+    private void createPath(String name, String path, boolean docType, boolean onClick){
+        pathRepository.save(new Path(name, path, docType, onClick));
     }
 
     @Transactional

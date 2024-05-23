@@ -70,5 +70,11 @@ public class StudentController {
         service.move(studentId, groupId);
         return HttpStatus.ACCEPTED;
     }
+
+    @GetMapping("/clearGroup")
+    public HttpStatus clearGroup(@RequestParam("id")int id){
+        service.clearGroup(id);
+        return HttpStatus.OK;
+    }
 }
 

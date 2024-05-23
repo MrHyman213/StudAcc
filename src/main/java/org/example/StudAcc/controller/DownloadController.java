@@ -34,8 +34,9 @@ public class DownloadController {
 
     @Secured("ROLE_ADMIN")
     @PostMapping("/create")
-    public HttpStatus create(@RequestParam("file") MultipartFile file, @RequestParam("reportName") String name, @RequestParam("docType") boolean docType){
-        templateService.createNewTemplate(file, name, docType);
+    public HttpStatus create(@RequestParam("file") MultipartFile file, @RequestParam("reportName") String name,
+                             @RequestParam("docType") boolean docType, @RequestParam("onClick") boolean onClick){
+        templateService.createNewTemplate(file, name, docType, onClick);
         return HttpStatus.CREATED;
     }
 

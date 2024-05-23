@@ -109,6 +109,11 @@ public class StudentService {
         }
     }
 
+    @Transactional
+    public void clearGroup(int id) {
+        groupService.getById(id).getStudents().forEach(student -> delete(student.getId()));
+    }
+
     public Student mapToModel(org.example.StudAcc.DTO.excel.Student properties){
         Student student = mapper.map(properties, Student.class);
         student.setEducation(educationService.getByName(properties.getEducation()));

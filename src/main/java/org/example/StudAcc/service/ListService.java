@@ -23,9 +23,11 @@ import org.example.StudAcc.service.organization.SpecializationService;
 import org.example.StudAcc.service.security.RoleService;
 import org.example.StudAcc.service.student.EducationService;
 import org.example.StudAcc.service.student.OrderNumberService;
+import org.example.StudAcc.service.student.StudentService;
 import org.example.StudAcc.utils.exceptions.organization.DisciplineNotFoundException;
 import org.example.StudAcc.utils.exceptions.organization.EmployeeNotFoundException;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,8 +72,8 @@ public class ListService {
     }
 
     //group
-    ///////////////////////////////////////////////////////
 
+    ///////////////////////////////////////////////////////
     public List<Group> getGroupBySpecId(int specId){
         return specializationService.getById(specId).getGroupList();
     }
@@ -106,7 +108,6 @@ public class ListService {
     public List<Group> getAllGroups() {
         return groupService.getAll();
     }
-
     //orders
     ////////////////////////////////////////////////////////////////////
 
@@ -128,9 +129,9 @@ public class ListService {
     public void deleteOrder(int id){
         orderNumberService.delete(id);
     }
-
     //education
     //////////////////////////////////////////////////////////////////
+
     public List<Education> getEducationList(){
         return educationService.getAll();
     }
@@ -149,13 +150,13 @@ public class ListService {
     public void deleteEducation(int id){
         educationService.delete(id);
     }
-
     //employee
     ////////////////////////////////////////////////////////////////////////////////
     @Transactional
     public List<Employee> getAllEmployee(){
         return employeeRepository.findAll();
     }
+
     public Employee getEmployee(int id){
         try {
             return employeeRepository.findById(id).get();
@@ -179,9 +180,9 @@ public class ListService {
     public void deleteEmployee(int id){
         employeeRepository.deleteById(id);
     }
-
     //discipline
     ////////////////////////////////////////////////////////////////////////////////
+
     public List<Discipline> getDisciplineList(int id) {
         return specializationService.getById(id).getDisciplineList();
     }
@@ -193,7 +194,6 @@ public class ListService {
             throw new DisciplineNotFoundException("Дисциплина \"" + name + "\" не найдена.");
         }
     }
-
     public Discipline getDiscipline(int id){
         try {
             return disciplineRepository.findById(id).get();
@@ -201,6 +201,7 @@ public class ListService {
             throw new DisciplineNotFoundException("Дисциплина с идентификатором " + id + " не найдена.");
         }
     }
+
     public Discipline mapToModel(DirectoryDTO dto){
         Discipline discipline = mapper.map(dto, Discipline.class);
         discipline.setSpecialization(specializationService.getById(dto.getParentId()));
@@ -220,9 +221,9 @@ public class ListService {
     public void deleteDiscipline(int id) {
         disciplineRepository.deleteById(id);
     }
-
     //region
     ////////////////////////////////////////////////////////////////////
+
     public List<Region> getRegionList(){
         return oblastService.getAll();
     }
@@ -245,9 +246,9 @@ public class ListService {
     public Region getRegionById(int id){
         return oblastService.getById(id);
     }
-
     // district
     ////////////////////////////////////////////////////////////////////
+
     public District getDistrictById(int id){
         return districtService.getById(id);
     }

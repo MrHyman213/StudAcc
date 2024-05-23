@@ -1,4 +1,4 @@
-package org.example.StudAcc.service.download.pattern;
+package org.example.StudAcc.DTO.doc.pattern;
 
 import java.util.HashMap;
 import java.util.Map;

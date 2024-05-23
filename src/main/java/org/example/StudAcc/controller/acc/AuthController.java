@@ -27,7 +27,6 @@ public class AuthController {
     @Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_BLOCKED"})
     @GetMapping("/info")
     public List<Role> getRoles(Principal principal){
-        System.out.println("Username - " + principal.getName());
         return service.getRolesByUsername(principal.getName());
     }
 
