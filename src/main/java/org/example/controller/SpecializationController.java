@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import org.example.model.Entry;
 import org.example.service.RequestService;
@@ -29,23 +30,28 @@ public class SpecializationController implements Initializable {
     private Button btAdmin;
 
     @FXML
-    void adminPanelAct(ActionEvent event) {
+    private Label lbLists;
+    private boolean switcher = true;
+    private boolean anotherSwitcher = true;
+
+    @FXML
+    void adminPanelAct(ActionEvent ignoredEvent) {
 
     }
 
     @FXML
-    void moveAct(ActionEvent event) {
+    void moveAct(ActionEvent ignoredEvent) {
         WindowManager.open("move", "Перевод", false, true);
     }
 
     @FXML
-    void exitAct(ActionEvent event) {
+    void exitAct(ActionEvent ignoredEvent) {
         Platform.exit();
         System.exit(0);
     }
 
     @FXML
-    void updateList(ActionEvent event) {
+    void updateList(ActionEvent ignoredEvent) {
         initSpecList();
     }
 
@@ -73,12 +79,28 @@ public class SpecializationController implements Initializable {
     }
 
     private void initLists(){
+        lbLists.setOnMouseClicked(event -> {
+            if (!cbLists.isShowing() && anotherSwitcher) {
+                anotherSwitcher = false;
+                cbLists.show();
+            } else {
+                anotherSwitcher = true;
+                cbLists.hide();
+            }
+        });
         cbLists.setItems(FXCollections.observableArrayList(EntryContainer.getList("titles")));
-        cbLists.setOnAction((actionEvent -> {
-            String selectedList = cbLists.getSelectionModel().getSelectedItem();
-            ListController.selectedList = EntryContainer.getListByListTitle(selectedList);
-            ListController.isSub = false;
-            WindowManager.open("list", selectedList, false, false);
-        }));
+        cbLists.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && switcher) {
+                anotherSwitcher = true;
+                switcher = false;
+                ListController.selectedList = EntryContainer.getListByListTitle(newValue);
+                ListController.isSub = false;
+                WindowManager.open("list", newValue, false, false);
+                Platform.runLater(() -> {
+                    cbLists.getSelectionModel().clearSelection();
+                    switcher = true;
+                });
+            }
+        });
     }
 }

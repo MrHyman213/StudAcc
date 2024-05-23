@@ -72,8 +72,9 @@ public class RequestService {
                 user.setUsername(login);
                 user.setPassword(password);
                 return true;
-            } else if (response.statusCode() == 401)
+            } else if (response.statusCode() == 401) {
                 return false;
+            }
         } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -111,6 +112,9 @@ public class RequestService {
         HttpResponse<String> response = request(RequestType.GET, "list/group/move?out=" + out + "&in=" + in, null);
         if (response.statusCode() == 401)
             throw new UnauthorizedException();
+    }
+    public static void clearGroup(int id) {
+        request(RequestType.GET, "student/clearGroup?id=" + id, null);
     }
     //student
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -158,11 +162,11 @@ public class RequestService {
     public static void deleteStudent(int id) {
         request(RequestType.DELETE, "student/delete?id=" + id, null);
     }
-
     public static void moveStudent(int studentId, int groupId){
         request(RequestType.POST, "student/move?idStudent=" + studentId + "&idGroup=" + groupId, null);
     }
     //address
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static void updateAddress(AddressDTO address, int addressId) {
@@ -175,8 +179,8 @@ public class RequestService {
             return Integer.parseInt(response.body());
         return 0;
     }
-
     //list
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static List<Entry> getList(String selectedList, int idMainItem, boolean isSub) {
@@ -214,18 +218,19 @@ public class RequestService {
     public static void updateList(EntryDTO entry, String selectedList, int id){
         request(RequestType.PUT, "list/" + selectedList + "/update?id=" + id, entry);
     }
-
     //report
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static void generateFile(int groupId, TemplatesDTO template, ReportDTO report) {
         Map<String, String> headers = Map.of("Authorization", "Bearer " + user.getToken(), "Content-Type", "application/json", "Accept-Encoding", "UTF-8");
         HttpRequest req = RequestManager.post(URL + "report/download?id=" + groupId + "&idTemplate=" + template.getId(), report, headers);
-        String path = (System.getProperty("user.home") + "/Downloads/StudAcc/" + LocalDate.now() + ".docx");
+        String path = (System.getProperty("user.home") + "/Downloads/StudAcc/");
+        String fileName = LocalDate.now() + ".docx";
         Platform.runLater(() -> {
             try {
-                FileManager.createFile(client.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray()).get().body(), path);
-                ProcessBuilder builder = new ProcessBuilder("cmd", "/c", "start winword " + path.replace("/", "\\"));
+                FileManager.createFile(client.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray()).get().body(), path, fileName);
+                ProcessBuilder builder = new ProcessBuilder("cmd", "/c", "start winword " + (path + "\\" + fileName).replace("/", "\\"));
                 try {
                     builder.start();
                 } catch (IOException e) {
@@ -257,8 +262,8 @@ public class RequestService {
                 .header("Authorization", "Bearer " + user.getToken())
                 .field("file", selectedFile).asString();
     }
-
     //role
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static List<User> getUserList() {

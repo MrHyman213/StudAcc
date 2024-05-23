@@ -15,9 +15,9 @@ public class EntryContainer {
         lists.put("sex", List.of("Мужской", "Женский"));
         lists.put("titles", List.of(" - Группы и специальности", " - Области",
                 " - Дисциплины", " - Номера приказов", " - Преподаватели",
-                " - Предыдущее образование", " - Организация", " - Пользователи"));
+                " - Предыдущее образование"));
         lists.put("lists", List.of("spec", "region", "Spec", "order",
-                "employee", "education", "organization", "user"));
+                "employee", "education"));
         lists.put("subsidiaryLists", List.of("group", "district", "discipline"));
         lists.put("subsidiaryTitles", List.of("Группы", "Районы", "Дисциплины"));
     }
@@ -54,6 +54,14 @@ public class EntryContainer {
         return lists.get(key);
     }
 
+    public static String getParentItem(String subItem) {
+        try {
+            return lists.get("lists").get(getIndexByName(lists.get("subsidiaryLists"), subItem));
+        } catch (IndexOutOfBoundsException | NullPointerException e) {
+            return null;
+        }
+    }
+
     public static String getSubItem(String mainItem) {
         try {
             return lists.get("subsidiaryLists").get(getIndexByName(lists.get("lists"), mainItem));
@@ -83,5 +91,4 @@ public class EntryContainer {
     public static int getIdByName(String cell, String name){
         return container.get(cell).get(name);
     }
-
 }

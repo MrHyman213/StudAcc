@@ -15,7 +15,7 @@
             <Font size="25.0" />
          </font>
       </Label>
-      <ComboBox fx:id="cbLists" layoutX="14.0" layoutY="21.0" prefWidth="150.0" promptText="Справочники 📋" />
+      <ComboBox fx:id="cbLists" layoutX="14.0" layoutY="21.0" prefWidth="150.0" />
       <Button layoutX="173.0" layoutY="21.0" mnemonicParsing="false" onAction="#moveAct" text="Перевести ⏩" />
       <Button layoutX="267.0" layoutY="21.0" mnemonicParsing="false" onAction="#exitAct" text="Выход 🏠" />
       <Button layoutX="14.0" layoutY="55.0" mnemonicParsing="false" onAction="#updateList" text="🔄">
@@ -28,5 +28,6 @@
             <Font size="15.0" />
          </font>
       </Button>
+      <Label fx:id="lbLists" layoutX="25.0" layoutY="25.0" text="Справочники 📋" />
    </children>
 </AnchorPane>

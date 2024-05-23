@@ -27,12 +27,13 @@
       <Label fx:id="lbCount" layoutX="524.0" layoutY="80.0" prefHeight="21.0" prefWidth="20.0" text="counter" />
       <Line endX="430.0" layoutX="115.0" layoutY="117.0" startX="-100.0" />
       <Button layoutX="478.0" layoutY="561.0" mnemonicParsing="false" onAction="#exitAct" text="Выход ❌" />
-      <ComboBox fx:id="cbReport" layoutX="396.0" layoutY="14.0" onAction="#reportSelected" prefHeight="25.0" prefWidth="150.0" promptText="Печать" />
+      <ComboBox fx:id="cbReport" layoutX="396.0" layoutY="14.0" prefHeight="25.0" prefWidth="150.0" />
       <Button layoutX="213.0" layoutY="75.0" mnemonicParsing="false" onAction="#importAct" text="Импорт 📥" />
       <Button layoutX="17.0" layoutY="72.0" mnemonicParsing="false" onAction="#updateAct" text="🔄">
          <font>
             <Font size="15.0" />
          </font>
       </Button>
+      <Label fx:id="lbReport" layoutX="408.0" layoutY="18.0" text="Печать 📇 " />
    </children>
 </AnchorPane>

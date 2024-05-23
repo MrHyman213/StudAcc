@@ -1,0 +1,5 @@
+.transparent-label {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    pointer-events: none;
+}

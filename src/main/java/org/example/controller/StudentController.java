@@ -138,6 +138,20 @@ public class StudentController implements Initializable {
     }
 
     @FXML
+    void openOrderAct(ActionEvent event) {
+        ListController.selectedList = "order";
+        ListController.isSub = false;
+        WindowManager.open("list", "Номера приказов", false, false);
+    }
+
+    @FXML
+    void openRegionAct(ActionEvent event) {
+        ListController.selectedList = "region";
+        ListController.isSub = false;
+        WindowManager.open("list", "Области", false, false);
+    }
+
+    @FXML
     void exitAct(ActionEvent event) {
         WindowManager.close(lbGroup);
     }

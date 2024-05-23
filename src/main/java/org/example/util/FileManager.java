@@ -1,6 +1,7 @@
 package org.example.util;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
@@ -9,13 +10,14 @@ import java.nio.file.Paths;
 
 public class FileManager {
 
-    public static void createFile(byte[] bytes, String path){
+    public static void createFile(byte[] bytes, String path, String fileName){
         try {
+            new File(path).mkdirs();
             BufferedOutputStream stream = new BufferedOutputStream(
-                    new FileOutputStream(path));
+                    new FileOutputStream(path + "\\" + fileName));
             stream.write(bytes);
             stream.close();
-            copyFile(path);
+            copyFile(path + "\\" + fileName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

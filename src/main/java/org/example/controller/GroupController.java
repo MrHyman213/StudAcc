@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -7,12 +8,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import org.example.controller.report.ImportController;
-import org.example.model.Entry;
+import org.example.DTO.ReportDTO;
 import org.example.DTO.TemplatesDTO;
-import org.example.model.student.ShortStudent;
 import org.example.controller.report.GroupReportController;
+import org.example.controller.report.ImportController;
 import org.example.controller.report.SingleReportController;
+import org.example.model.Entry;
+import org.example.model.student.ShortStudent;
 import org.example.service.RequestService;
 import org.example.util.EntryContainer;
 import org.example.util.WindowManager;
@@ -48,7 +50,12 @@ public class GroupController implements Initializable {
     @FXML
     private TableColumn<ShortStudent, String> clSurname;
 
+    @FXML
+    private Label lbReport;
+
     public static Entry selectedSpecialization;
+    private boolean switcher = true;
+    private boolean secondSwitcher = true;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -61,6 +68,40 @@ public class GroupController implements Initializable {
             cbReport.setItems(FXCollections.observableArrayList(RequestService.getReportList()));
             cbGroup.setItems(FXCollections.observableArrayList(RequestService.getList("group", selectedSpecialization.getId(), true)));
             cbGroup.getSelectionModel().selectFirst();
+            lbReport.setOnMouseClicked(event -> {
+                if (!cbReport.isShowing() && secondSwitcher) {
+                    secondSwitcher = false;
+                    cbReport.show();
+                } else {
+                    secondSwitcher = true;
+                    cbReport.hide();
+                }
+            });
+            cbReport.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                if(newValue != null && switcher){
+                    secondSwitcher = true;
+                    switcher = false;
+                    TemplatesDTO template = cbReport.getSelectionModel().getSelectedItem();
+                    if(!template.getOnClick()) {
+                        if (!template.getDocType()) {
+                            GroupReportController.selectedTemplate = template;
+                            GroupReportController.selectedGroup = cbGroup.getSelectionModel().getSelectedItem();
+                            WindowManager.open("report/forGroup", template.getName(), false, true);
+                        } else {
+                            SingleReportController.name = template.getName();
+                            SingleReportController.selectedStudent = tvStudents.getSelectionModel().getSelectedItem();
+                            SingleReportController.studentList = tvStudents.getItems();
+                            SingleReportController.selectedTemplate = cbReport.getSelectionModel().getSelectedItem();
+                            WindowManager.open("report/single", template.getName(), false, true);
+                        }
+                    } else
+                        RequestService.generateFile(cbGroup.getSelectionModel().getSelectedItem().getId(), cbReport.getSelectionModel().getSelectedItem(), new ReportDTO());
+                    Platform.runLater(() -> {
+                        cbReport.getSelectionModel().clearSelection();
+                        switcher = true;
+                    });
+                }
+            });
         } catch (NullPointerException ignored){}
     }
 
@@ -95,22 +136,6 @@ public class GroupController implements Initializable {
     @FXML
     void groupSelected(ActionEvent event) {
         initTable();
-    }
-
-    @FXML
-    void reportSelected(ActionEvent event) {
-        TemplatesDTO template = cbReport.getSelectionModel().getSelectedItem();
-        if(!template.getDocType()) {
-            GroupReportController.selectedTemplate = template;
-            GroupReportController.selectedGroup = cbGroup.getSelectionModel().getSelectedItem();
-            WindowManager.open("report/forGroup", template.getName(), false, true);
-        } else {
-            SingleReportController.name = template.getName();
-            SingleReportController.selectedStudent = tvStudents.getSelectionModel().getSelectedItem();
-            SingleReportController.studentList = tvStudents.getItems();
-            SingleReportController.selectedTemplate = cbReport.getSelectionModel().getSelectedItem();
-            WindowManager.open("report/single", template.getName(), false, true);
-        }
     }
 
     @FXML

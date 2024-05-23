@@ -44,8 +44,11 @@ public class MappingService {
     }
 
     public static AddressDTO addressToDTO(Address address){
-        AddressDTO dto = modelMapper.map(address, AddressDTO.class);
-        dto.setIdDistrict(address.getDistrict().getId());
-        return dto;
+        try {
+            AddressDTO dto = modelMapper.map(address, AddressDTO.class);
+            dto.setIdDistrict(address.getDistrict().getId());
+            return dto;
+        } catch (NullPointerException ignored){}
+        return null;
     }
 }

@@ -12,6 +12,7 @@ public class TemplatesDTO extends Entry {
     private int id;
     private String name;
     private Boolean docType;
+    private Boolean onClick;
 
     @Override
     public String toString() {

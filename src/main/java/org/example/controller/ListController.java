@@ -29,9 +29,9 @@ public class ListController implements Initializable {
 
     public static String selectedList;
 
-    private Logger logger = Logger.getLogger(ListController.class.getName());
+    private final Logger logger = Logger.getLogger(ListController.class.getName());
     private String subItem;
-    private static int idMainItem;
+    public static int idMainItem;
     public static boolean isSub;
 
     @Override
@@ -79,6 +79,7 @@ public class ListController implements Initializable {
     @FXML
     void exitAct(ActionEvent event) {
         WindowManager.close(itemList);
+        selectedList = EntryContainer.getParentItem(selectedList);
         isSub = false;
     }
 
@@ -101,7 +102,7 @@ public class ListController implements Initializable {
                     selectedList = subItem;
                     isSub = true;
                     idMainItem = EntryContainer.getIdByName("itemList", selectedItem.getName());
-                    WindowManager.open("list", EntryContainer.getSubTitle(subItem), false, true);
+                    WindowManager.open("list", EntryContainer.getSubTitle(subItem), false, false);
                 } catch (NullPointerException ignored) {}
             }
         });

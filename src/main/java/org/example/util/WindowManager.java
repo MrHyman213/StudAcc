@@ -28,7 +28,7 @@ public class WindowManager {
             if(withCloseButton)
                 stage.initStyle(StageStyle.UTILITY);
             else stage.initStyle(StageStyle.UNDECORATED);
-            stage.show();
+            stage.showAndWait();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

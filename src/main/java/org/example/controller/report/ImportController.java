@@ -55,7 +55,8 @@ public class ImportController implements Initializable {
                 new FileChooser.ExtensionFilter("Excel Files", "*.csv"));
         chooser.setInitialDirectory(new File(System.getProperty("user.home") + "\\Desktop"));
         selectedFile = chooser.showOpenDialog(btSelect.getScene().getWindow());
-        tfPath.setText(selectedFile.getAbsolutePath());
+        if (selectedFile != null)
+            tfPath.setText(selectedFile.getAbsolutePath());
     }
 
     @Override
@@ -75,8 +76,10 @@ public class ImportController implements Initializable {
         tfPath.setOnDragDropped(event -> {
             if (event.getGestureSource() != tfPath && event.getDragboard().hasFiles()) {
                 event.getDragboard().getFiles().forEach(file -> {
-                    selectedFile = file;
-                    tfPath.setText(file.getAbsolutePath());
+                    if (file.getName().endsWith(".csv")) {
+                        selectedFile = file;
+                        tfPath.setText(file.getAbsolutePath());
+                    }
                 });
                 event.setDropCompleted(true);
             } else {
